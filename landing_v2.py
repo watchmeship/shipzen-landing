@@ -23,7 +23,9 @@ from flask import Flask, render_template_string, request, jsonify
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET", "shipzen-landing-v2-2026")
 
-DB_PATH = Path(__file__).resolve().parent / "landing_leads.db"
+# Use /data volume on Railway for persistent storage, fall back to local for dev
+_data_dir = Path("/data") if Path("/data").exists() else Path(__file__).resolve().parent
+DB_PATH = _data_dir / "landing_leads.db"
 
 
 def get_db():
