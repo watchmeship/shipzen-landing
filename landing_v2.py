@@ -176,6 +176,11 @@ def landing():
     return render_template_string(LANDING_HTML)
 
 
+@app.route("/book")
+def book():
+    return render_template_string(BOOK_HTML)
+
+
 @app.route("/api/lead", methods=["POST"])
 def submit_lead():
     data = request.get_json(silent=True) or {}
@@ -1277,6 +1282,168 @@ draw();
 
 
 })();
+</script>
+</body>
+</html>"""
+
+
+
+# ---------------------------------------------------------------------------
+# /book — FB Ad Lead Gen Page (Calendly call booking)
+# ---------------------------------------------------------------------------
+
+BOOK_HTML = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a Free Savings Call — ShipZen</title>
+<meta name="description" content="Find out exactly how much you can save on UPS Ground shipping. Book a free 15-minute call with ShipZen.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--navy:#1a1a1a;--body:#475569;--muted:#64748b;--green:#10b981;
+--border:#e2e8f0;--accent:#1a1a1a;
+--font-head:'Nunito',sans-serif;--font-body:'Inter',sans-serif;
+}
+html{font-size:16px;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);color:var(--body);background:#ABCDE9;line-height:1.65;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.cloud-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.cloud-bg .sky-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8;mix-blend-mode:multiply}
+.cloud-bg .sky-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(166,203,232,.2),rgba(191,217,239,.4),rgba(234,227,214,.6))}
+.nav{position:relative;z-index:10;height:64px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.15);backdrop-filter:blur(12px)}
+.nav-brand{font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--navy);display:flex;align-items:center;gap:.5rem}
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;color:var(--navy);background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.85);padding:.3rem .85rem;border-radius:9999px;margin-bottom:1.1rem;text-transform:uppercase;letter-spacing:.07em;backdrop-filter:blur(8px)}
+.hero h1{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.08;letter-spacing:-.04em;color:var(--navy);margin-bottom:1rem}
+.hero h1 .hl{color:#2563eb}
+.hero-sub{font-size:1.05rem;color:var(--body);max-width:580px;margin-bottom:1.75rem;line-height:1.7}
+.trust-row{display:flex;flex-wrap:wrap;gap:.65rem 1.5rem;margin-bottom:2rem}
+.trust-item{display:flex;align-items:center;gap:.45rem;font-size:.85rem;font-weight:600;color:var(--navy)}
+.trust-item svg{color:var(--green);flex-shrink:0}
+.savings-strip{background:rgba(255,255,255,.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.75);border-radius:16px;padding:1.25rem 1.75rem;margin-bottom:2rem;display:flex;flex-wrap:wrap;gap:1rem 2.5rem;align-items:center}
+.sav-item{text-align:center}
+.sav-val{font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:var(--navy);letter-spacing:-.03em;line-height:1.1}
+.sav-val .accent{color:#2563eb}
+.sav-label{font-size:.72rem;color:var(--muted);font-weight:500;margin-top:.15rem}
+.sav-divider{width:1px;height:40px;background:var(--border);flex-shrink:0}
+@media(max-width:500px){.sav-divider{display:none}.savings-strip{justify-content:space-around}}
+.cal-section{background:rgba(255,255,255,.7);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.85);border-radius:20px;padding:2rem 2rem 1rem;box-shadow:0 8px 32px rgba(0,0,0,.07);margin-bottom:2rem}
+.cal-header{margin-bottom:1.25rem}
+.cal-header h2{font-family:var(--font-head);font-size:1.35rem;font-weight:700;color:var(--navy);letter-spacing:-.025em;margin-bottom:.3rem}
+.cal-header p{font-size:.88rem;color:var(--muted)}
+.calendly-inline-widget{min-width:280px;height:700px}
+.proof-section{margin-bottom:2rem}
+.proof-card{background:rgba(255,255,255,.55);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.7);border-radius:16px;padding:1.75rem 2rem;box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.proof-quote{font-size:1rem;font-weight:500;color:var(--navy);line-height:1.7;font-style:italic;margin-bottom:1rem;padding-top:2rem;position:relative}
+.proof-quote::before{content:'\201C';font-size:2.2rem;font-weight:900;color:var(--navy);opacity:.15;position:absolute;top:-.1rem;left:0;font-style:normal;line-height:1}
+.proof-author{font-size:.82rem;font-weight:700;color:var(--navy)}
+.proof-role{font-size:.75rem;color:var(--muted);margin-top:.1rem}
+.faq-section{margin-bottom:2rem}
+.faq-title{font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:1rem}
+.faq-list{background:rgba(255,255,255,.5);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.65);border-radius:16px;overflow:hidden}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.55)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;background:none;border:none;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:var(--font-head);font-size:.9rem;font-weight:700;color:var(--navy);text-align:left;gap:.75rem;transition:background .2s}
+.faq-q:hover{background:rgba(255,255,255,.3)}
+.faq-chevron{width:16px;height:16px;flex-shrink:0;transition:transform .3s;color:var(--muted)}
+.faq-item.open .faq-chevron{transform:rotate(180deg)}
+.faq-ans{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-item.open .faq-ans{max-height:400px}
+.faq-ans-inner{padding:.1rem 1.25rem 1rem;font-size:.84rem;color:var(--body);line-height:1.75}
+.bottom-cta{text-align:center;padding:1.5rem;background:rgba(255,255,255,.55);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.7);border-radius:16px}
+.bottom-cta p{font-size:.88rem;color:var(--muted);margin-bottom:.75rem}
+.btn-book{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent);color:#fff;font-family:var(--font-head);font-weight:700;font-size:.95rem;padding:.8rem 2rem;border-radius:9999px;border:none;cursor:pointer;transition:all .25s;text-decoration:none}
+.btn-book:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+@media(max-width:600px){
+.hero h1{font-size:1.9rem}
+.cal-section{padding:1.25rem 1rem .5rem}
+.calendly-inline-widget{height:650px}
+.savings-strip{padding:1rem 1.25rem}
+}
+</style>
+</head>
+<body>
+<div class="cloud-bg">
+<img class="sky-img" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/bfd2f4cf-65ed-4b1a-86d1-a1710619267b_1600w.png" alt="" loading="eager">
+<div class="sky-gradient"></div>
+</div>
+<nav class="nav">
+<div class="nav-brand">
+<svg width="26" height="26" viewBox="0 0 40 40" fill="none"><path d="M4,2L36,2Q39,2 39,5L39,14L7,29L1,14L1,5Q1,2 4,2Z" fill="#1e3a8a"/><path d="M33,11L39,26L39,35Q39,38 36,38L4,38Q1,38 1,35L1,26Z" fill="#00b4d8" opacity=".80"/></svg>
+ShipZen
+</div>
+</nav>
+<div class="page">
+  <section class="hero">
+    <div class="hero-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      Free 15-Minute Savings Call
+    </div>
+    <h1>Stop leaving <span class="hl">$1–$2</span> on the table<br>every single shipment.</h1>
+    <p class="hero-sub">ShipZen gives e-commerce sellers enterprise UPS Ground rates — the same pricing tier as companies shipping millions of packages a year. No contracts, no minimums. Book a free call and we'll show you exactly what you'd save.</p>
+    <div class="trust-row">
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No setup fees</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No contracts</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Cancel anytime</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Live in under 24 hours</div>
+    </div>
+  </section>
+  <div class="savings-strip">
+    <div class="sav-item"><div class="sav-val">$1–$2</div><div class="sav-label">saved per label on average</div></div>
+    <div class="sav-divider"></div>
+    <div class="sav-item"><div class="sav-val"><span class="accent">$500</span>–<span class="accent">$5,000</span></div><div class="sav-label">back per month at 500–2,500 shipments</div></div>
+    <div class="sav-divider"></div>
+    <div class="sav-item"><div class="sav-val">48</div><div class="sav-label">states, flat-rate</div></div>
+    <div class="sav-divider"></div>
+    <div class="sav-item"><div class="sav-val">$0</div><div class="sav-label">hidden fees or zone charges</div></div>
+  </div>
+  <div class="cal-section">
+    <div class="cal-header">
+      <h2>📅 Pick a time that works for you</h2>
+      <p>15 minutes. We'll pull your shipping data, show you your exact savings, and answer any questions.</p>
+    </div>
+    <!-- REPLACE THE URL BELOW WITH YOUR REAL CALENDLY LINK -->
+    <div class="calendly-inline-widget" data-url="https://calendly.com/YOUR_LINK_HERE/15min?hide_gdpr_banner=1&primary_color=1e3a8a"></div>
+  </div>
+  <div class="proof-section">
+    <div class="proof-card">
+      <div class="proof-quote">We switched from Pirate Ship and immediately saw the difference. The flat-rate pricing simplified everything and we're saving more on every shipment. Setup took less than a day.</div>
+      <div class="proof-author">E-Commerce Store Owner</div>
+      <div class="proof-role">500+ shipments/month</div>
+    </div>
+  </div>
+  <div class="faq-section">
+    <div class="faq-title">Common questions</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="tFaq(this)">Is this just like Pirate Ship or EasyShip?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">No. Aggregators like Pirate Ship pool thousands of unrelated sellers — UPS can't optimize routes around that noise, so pricing reflects the uncertainty. ShipZen holds a direct enterprise UPS Ground contract with dedicated, predictable lanes. That's what unlocks pricing tiers aggregators simply can't reach.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="tFaq(this)">Do I have to switch carriers or change my workflow?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">You're still shipping UPS Ground with full tracking and the same delivery network. The only thing that changes is what you pay. We integrate with Shopify, WooCommerce, BigCommerce, Etsy, Amazon, eBay, and more — most sellers are live within 24 hours.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="tFaq(this)">Are there volume minimums or long-term contracts?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">None. No monthly fees, no minimums, no cancellation fees. You pay per label, that's it. Cancel anytime.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-cta">
+    <p>Prefer to go straight to booking?</p>
+    <a href="https://calendly.com/YOUR_LINK_HERE/15min" class="btn-book" target="_blank">📅 Book Your Free Call</a>
+  </div>
+</div>
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+<script>
+function tFaq(btn){var item=btn.closest('.faq-item');var wasOpen=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(function(el){el.classList.remove('open');});if(!wasOpen)item.classList.add('open');}
 </script>
 </body>
 </html>"""
