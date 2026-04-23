@@ -181,6 +181,11 @@ def book():
     return render_template_string(BOOK_HTML)
 
 
+@app.route("/version")
+def version():
+    return jsonify({"version": "2026-04-23", "routes": ["/", "/book", "/admin/leads", "/api/lead"]})
+
+
 @app.route("/api/lead", methods=["POST"])
 def submit_lead():
     data = request.get_json(silent=True) or {}
