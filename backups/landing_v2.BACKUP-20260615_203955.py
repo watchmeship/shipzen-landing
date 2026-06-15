@@ -215,7 +215,7 @@ def submit_lead():
         "monthly_shipments": data.get("monthly_shipments", "").strip(),
     })
 
-    return jsonify({"ok": True, "message": "Thanks! We'll send your free refund-recovery audit within 24 hours."})
+    return jsonify({"ok": True, "message": "Thanks! We'll send your savings quote within 24 hours."})
 
 
 LANDING_HTML = r"""<!DOCTYPE html>
@@ -223,8 +223,8 @@ LANDING_HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ShipZen — Automated Carrier Refund Recovery for E-Commerce</title>
-<meta name="description" content="ShipZen automatically audits your shipments and files carrier claims for late, lost, Return-to-Sender, and damaged packages — recovering both shipping cost and product value. No upfront fees, success-based.">
+<title>ShipZen — Enterprise UPS Ground Rates for E-Commerce</title>
+<meta name="description" content="Enterprise UPS Ground rates powered by lane optimization. Save $1–$2 on average per shipping label vs Pirate Ship, ShipStation, EasyShip.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -481,7 +481,7 @@ ShipZen
 </a>
 <div class="nav-actions">
 <a href="#contact" class="btn-contact">Contact Sales</a>
-<a href="#contact" class="btn-primary">Get Free Audit</a>
+<a href="#contact" class="btn-primary">Get Started</a>
 </div>
 </div>
 </nav>
@@ -492,18 +492,18 @@ ShipZen
 <div class="container">
 <div class="hero-grid">
 <div class="hero-left">
-<div class="hero-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Refund Recovery — No Upfront Fees</div>
-<h1>Carriers owe you money.<br>We get it back.</h1>
-<p class="hero-sub">Every late delivery, lost package, Return-to-Sender, and damaged shipment is money the carrier owes you — and almost never pays automatically. ShipZen audits every shipment and files the claims for you. <strong>You only pay when we recover.</strong></p>
+<div class="hero-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enterprise UPS Rates — No Contracts</div>
+<h1>Pirate Ship is charging you zone fees.<br>We don't.</h1>
+<p class="hero-sub">Pirate Ship, ShipStation, and EasyShip pass zone fees, fuel surcharges, and DIM weight penalties straight to you. ShipZen has one flat rate — no exceptions. <strong>Save $1–$2 on every single label.</strong></p>
 <div class="hero-ctas">
-<a href="#contact" class="btn-primary" style="padding:.7rem 1.75rem;font-size:.95rem">&#128230; Get Your Free Audit</a>
+<a href="#contact" class="btn-primary" style="padding:.7rem 1.75rem;font-size:.95rem">&#128230; Calculate Your Savings</a>
 <a href="#how-it-works" class="hero-link">See how it works <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></a>
 </div>
-<p style="font-size:.8rem;color:var(--muted);margin-top:.85rem;">&#128274; No upfront fees &nbsp;·&nbsp; No risk to sign up &nbsp;·&nbsp; If we don't recover, you don't pay.</p>
+<p style="font-size:.8rem;color:var(--muted);margin-top:.85rem;">&#128274; No credit card &nbsp;·&nbsp; No contract &nbsp;·&nbsp; If we can't beat your rate, we'll tell you straight.</p>
 </div>
 <div class="form-card" id="contact">
-<div class="form-title">How much are carriers keeping?</div>
-<div class="form-sub">Drag the slider — see your estimated recoverable refunds</div>
+<div class="form-title">How much are you losing?</div>
+<div class="form-sub">Drag the slider — see your number instantly</div>
 <div style="margin:1.25rem 0 .5rem">
 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem">
 <label style="font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Packages per month</label>
@@ -516,20 +516,20 @@ ShipZen
 </div>
 </div>
 <div id="calc-result" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:var(--radius);padding:1rem 1.25rem;margin:1rem 0 1.25rem;text-align:center">
-<div style="font-size:.78rem;font-weight:600;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">Estimated recoverable refunds</div>
-<div id="monthly-loss" style="font-size:2rem;font-weight:800;color:#15803d;font-family:var(--font-head);line-height:1">$300/mo</div>
-<div id="yearly-loss" style="font-size:.88rem;color:#16a34a;margin-top:.2rem">= $3,600/year in potentially recoverable refunds</div>
+<div style="font-size:.78rem;font-weight:600;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">You're likely losing</div>
+<div id="monthly-loss" style="font-size:2rem;font-weight:800;color:#15803d;font-family:var(--font-head);line-height:1">$750/mo</div>
+<div id="yearly-loss" style="font-size:.88rem;color:#16a34a;margin-top:.2rem">= $9,000/year staying with your current carrier</div>
 </div>
 <form id="lead-form" class="fg" novalidate>
 <input type="hidden" id="monthly_shipments" name="monthly_shipments" value="501-1000">
 <div class="fi"><label>Your Email</label><input type="email" id="email" placeholder="you@yourstore.com" required></div>
-<div class="f-btns"><button type="submit" class="btn-submit" id="submit-btn">&#128230; Get My Free Audit</button></div>
+<div class="f-btns"><button type="submit" class="btn-submit" id="submit-btn">&#128230; Lock In My Rate</button></div>
 <div class="form-trust">
-<span>&#128274; No upfront fees</span>
-<span>&#10005; Success-based</span>
+<span>&#128274; No setup fees</span>
+<span>&#10005; No contracts</span>
 <span>&#8617; Cancel anytime</span>
 </div>
-<div style="font-size:.74rem;color:var(--muted);text-align:center;margin-top:.5rem">Estimate only. Your free audit shows the real recoverable amount.</div>
+<div style="font-size:.74rem;color:var(--muted);text-align:center;margin-top:.5rem">If we can't beat your current rate, we'll tell you straight.</div>
 <div class="form-msg" id="form-msg"></div>
 </form>
 <p style="font-size:.74rem;color:var(--muted);text-align:center;margin-top:.85rem;border-top:1px solid var(--border);padding-top:.75rem">&#9200; Currently onboarding sellers shipping 200+ packages/month</p>
@@ -543,10 +543,10 @@ ShipZen
 <section class="stats-section">
 <div class="stats-inner">
 <div class="stats-grid">
-<div class="stat-item fade-in"><div class="stat-val">~73<span class="stat-accent">%</span></div><div class="stat-label">estimated claim win rate</div></div>
-<div class="stat-item fade-in"><div class="stat-val">4</div><div class="stat-label">claim types: late, lost, RTS &amp; damaged</div></div>
-<div class="stat-item fade-in"><div class="stat-val">$0</div><div class="stat-label">upfront cost — success-based</div></div>
-<div class="stat-item fade-in"><div class="stat-val">2</div><div class="stat-label">recovered: shipping cost + product value</div></div>
+<div class="stat-item fade-in"><div class="stat-val">$1–$2</div><div class="stat-label">saved per label on average</div></div>
+<div class="stat-item fade-in"><div class="stat-val">48</div><div class="stat-label">states with flat-rate coverage</div></div>
+<div class="stat-item fade-in"><div class="stat-val">&lt;24<span class="stat-accent">hr</span></div><div class="stat-label">setup and integration time</div></div>
+<div class="stat-item fade-in"><div class="stat-val">$0</div><div class="stat-label">hidden fees or monthly charges</div></div>
 </div>
 </div>
 <div class="stats-logos">
@@ -578,24 +578,24 @@ ShipZen
 <section style="padding:3rem 0 2rem;position:relative;z-index:1">
 <div class="container">
 <div style="max-width:780px;margin:0 auto;background:rgba(255,255,255,.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.6);border-radius:var(--radius-xl);padding:2.5rem 3rem;box-shadow:0 8px 32px rgba(0,0,0,.06)">
-<p class="sl" style="margin-bottom:.6rem">Why You're Leaving Money Behind</p>
-<h2 style="font-family:var(--font-head);font-size:clamp(1.4rem,3vw,2rem);font-weight:700;color:var(--navy);margin-bottom:1.25rem;letter-spacing:-.03em">Carriers are structured to keep refunds you never claim</h2>
+<p class="sl" style="margin-bottom:.6rem">Why You're Overpaying</p>
+<h2 style="font-family:var(--font-head);font-size:clamp(1.4rem,3vw,2rem);font-weight:700;color:var(--navy);margin-bottom:1.25rem;letter-spacing:-.03em">Every other platform is structured to keep you paying more</h2>
 <div style="display:grid;gap:1.1rem">
 <div style="display:flex;gap:1rem;align-items:flex-start">
 <div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin-top:.1rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-<div><strong style="color:var(--navy);font-size:.95rem">Carriers don't refund you automatically.</strong> <span style="color:var(--body);font-size:.92rem">When a package is late, lost, returned to sender, or damaged, you're owed a refund — but the carrier won't volunteer it. The money sits there until someone files the claim.</span></div>
+<div><strong style="color:var(--navy);font-size:.95rem">Aggregators profit from your surcharges.</strong> <span style="color:var(--body);font-size:.92rem">Pirate Ship and EasyShip pass zone fees, fuel surcharges, and DIM weight penalties straight through to you — because that's how their margin works. Every surcharge is money out of your pocket, into theirs.</span></div>
 </div>
 <div style="display:flex;gap:1rem;align-items:flex-start">
 <div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin-top:.1rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-<div><strong style="color:var(--navy);font-size:.95rem">Filing claims manually is a full-time job.</strong> <span style="color:var(--body);font-size:.92rem">Tracking every shipment, catching missed guarantees, documenting damage, and chasing the carrier through their claims portal takes hours most teams simply don't have. So the refunds go unclaimed.</span></div>
+<div><strong style="color:var(--navy);font-size:.95rem">Going direct to UPS means retail pricing.</strong> <span style="color:var(--body);font-size:.92rem">You'd need to ship 500+ packages per week — consistently — just to qualify for commercial discounts. Most e-commerce brands don't have that volume alone.</span></div>
 </div>
 <div style="display:flex;gap:1rem;align-items:flex-start">
 <div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin-top:.1rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-<div><strong style="color:var(--navy);font-size:.95rem">Most eligible refunds expire unclaimed.</strong> <span style="color:var(--body);font-size:.92rem">Carriers set tight filing windows. Miss the deadline and the money is gone for good. ShipZen monitors every shipment in real time so nothing slips past the window.</span></div>
+<div><strong style="color:var(--navy);font-size:.95rem">3PLs are multi-carrier by design.</strong> <span style="color:var(--body);font-size:.92rem">ShipStation and ShipHero spread volume across every carrier. No single carrier relationship is deep enough to unlock enterprise pricing. ShipZen commits 100% to UPS Ground — and that's exactly why we get rates they can't touch.</span></div>
 </div>
 </div>
 <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border-lt)">
-<p style="font-size:.95rem;color:var(--navy);font-weight:600">ShipZen audits every shipment, files every eligible claim, and routes the recovered funds straight back to you. You do nothing. <span style="color:var(--green)">We only get paid when you do.</span></p>
+<p style="font-size:.95rem;color:var(--navy);font-weight:600">ShipZen pools your volume with other sellers into predictable, high-frequency lanes. UPS gives us enterprise pricing. You get the savings. <span style="color:var(--green)">Simple.</span></p>
 </div>
 </div>
 </div>
@@ -605,26 +605,26 @@ ShipZen
 <section class="ent-section">
 <div class="container">
 <p class="sl c">Why ShipZen</p>
-<h2 class="st c">Refund recovery without lifting a finger</h2>
+<h2 class="st c">Enterprise shipping rates without enterprise commitments</h2>
 <div style="height:2rem"></div>
 <div class="ent-grid">
 <div class="ent-card fade-in">
 <div class="ent-head">
-<h3>Automated audit &amp; recovery</h3>
+<h3>Save $1–$2 on average per shipping label</h3>
 <div class="ent-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
 </div>
 <div class="ent-visual"><canvas id="ent-cv-1"></canvas></div>
 </div>
 <div class="ent-card fade-in">
 <div class="ent-head">
-<h3>Comprehensive claims<br>management</h3>
+<h3>Ship anywhere across<br>all 48 states</h3>
 <div class="ent-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
 </div>
 <div class="ent-visual"><canvas id="ent-cv-2"></canvas></div>
 </div>
 <div class="ent-card fade-in">
 <div class="ent-head">
-<h3>Hands-off, risk-free partnership</h3>
+<h3>No hidden zone fees or dimensional weight charges</h3>
 <div class="ent-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
 </div>
 <div class="ent-visual"><canvas id="ent-cv-3"></canvas></div>
@@ -637,37 +637,37 @@ ShipZen
 <section class="hiw-section" id="how-it-works">
 <div class="container">
 <p class="sl c">How It Works</p>
-<h2 class="st c">How we recover your money</h2>
-<p class="sd c">No new software to learn, no change to how you ship. We work entirely in the background.</p>
+<h2 class="st c">Three things that make our rates unbeatable</h2>
+<p class="sd c">It&rsquo;s not a workaround or a loophole. It&rsquo;s how enterprise logistics pricing has always worked.</p>
 <div class="hiw-grid">
 <div class="hiw-card fade-in">
 <div class="hiw-head">
-<h3>We monitor every shipment</h3>
+<h3>We optimize your lanes</h3>
 <div class="hiw-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
 </div>
 <div class="hiw-body">
-<p class="hiw-desc">ShipZen syncs with your carrier account in seconds and tracks every package in real time — automatically flagging late deliveries, lost packages, Return-to-Sender, and damage the moment they happen.</p>
-<div class="hiw-result"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Nothing slips past the deadline</div>
+<p class="hiw-desc">Your shipments get consolidated into predictable, high-frequency routes. UPS builds our volume directly into daily truck schedules, eliminating wasted miles and empty trucks.</p>
+<div class="hiw-result"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Lower per-package cost</div>
 </div>
 </div>
 <div class="hiw-card fade-in">
 <div class="hiw-head">
-<h3>We file &amp; pursue the claims</h3>
+<h3>We validate every address</h3>
 <div class="hiw-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
 </div>
 <div class="hiw-body">
-<p class="hiw-desc">We aggressively pursue every eligible claim — for lost, damaged, and Return-to-Sender packages plus automated late-delivery refunds — recovering both the original shipping cost and the product value.</p>
-<div class="hiw-result"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Estimated ~73% claim win rate</div>
+<p class="hiw-desc">Every address is verified and standardized before a label prints. No correction fees, no failed deliveries, no surprise surcharges. Clean data means lower cost-to-serve.</p>
+<div class="hiw-result"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Zero hidden fees</div>
 </div>
 </div>
 <div class="hiw-card fade-in">
 <div class="hiw-head">
-<h3>Funds routed straight to you</h3>
+<h3>We commit 100% to UPS</h3>
 <div class="hiw-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
 </div>
 <div class="hiw-body">
-<p class="hiw-desc">Recovered refunds are credited back to you automatically — no manual admin, no paperwork on your end. We only take a share of what we actually recover, so our incentives are fully aligned with yours.</p>
-<div class="hiw-result"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Success-based — you only pay on wins</div>
+<p class="hiw-desc">No multi-carrier rate-shopping. Our long-term, dedicated UPS Ground commitment gives them the certainty they need to unlock enterprise pricing that aggregators can never access.</p>
+<div class="hiw-result"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enterprise-tier rates</div>
 </div>
 </div>
 </div>
@@ -678,26 +678,26 @@ ShipZen
 <section class="cmp-section">
 <div class="container">
 <p class="sl c">See The Difference</p>
-<h2 class="st c">Why ShipZen beats doing it yourself</h2>
-<p class="sd c">Recovering carrier refunds on your own means hours of tracking, documentation, and portal chasing — and most claims still expire unfiled.</p>
+<h2 class="st c">Why our rates beat going direct</h2>
+<p class="sd c">Shipping directly through UPS or USPS means paying retail rates with added surcharges. Even aggregators can&rsquo;t unlock the lowest pricing tiers.</p>
 <div class="cmp-table fade-in">
 <table>
 <thead>
 <tr>
 <th></th>
 <th class="hl">ShipZen</th>
-<th>Filing It Yourself<span class="sub">In-house, manual</span></th>
-<th>Doing Nothing<span class="sub">Status quo</span></th>
+<th>Aggregators<span class="sub">Pirate Ship, EasyShip</span></th>
+<th>UPS / USPS Direct<span class="sub">Retail rates</span></th>
 </tr>
 </thead>
 <tbody>
-<tr><td>Shipment Monitoring</td><td class="hl">Automated, real-time</td><td>Manual spot-checks</td><td>None</td></tr>
-<tr><td>Claim Types Covered</td><td class="hl">Late, lost, RTS &amp; damaged</td><td>Whatever you have time for</td><td>None filed</td></tr>
-<tr><td>What&rsquo;s Recovered</td><td class="hl">Shipping cost + product value</td><td>Often shipping cost only</td><td>$0</td></tr>
-<tr><td>Filing Deadlines</td><td class="hl">Never missed &mdash; we track them</td><td>Easy to miss</td><td>All expire unclaimed</td></tr>
-<tr><td>Your Time Spent</td><td class="hl">Zero &mdash; fully hands-off</td><td>Hours every week</td><td>None, but $0 recovered</td></tr>
-<tr><td>Upfront Cost</td><td class="hl">$0 &mdash; success-based</td><td>Staff hours</td><td>$0</td></tr>
-<tr><td>Refunds Recovered</td><td class="hl" style="font-weight:700;color:var(--accent)">Maximum, ~73% est. win rate</td><td style="font-weight:600;color:#dc2626">Partial</td><td style="font-weight:600;color:#dc2626">None</td></tr>
+<tr><td>Base Rate</td><td class="hl">Enterprise contract pricing</td><td>Discounted, but standard commercial</td><td>Published retail &mdash; highest tier</td></tr>
+<tr><td>Zone Surcharges</td><td class="hl">Flat rate &mdash; no zone fees</td><td>Reduced but still applied</td><td>$2&ndash;$8+ per package on long zones</td></tr>
+<tr><td>Fuel Surcharge</td><td class="hl">Already included in our rates</td><td>Passed through to seller</td><td>6&ndash;8% added to every shipment</td></tr>
+<tr><td>DIM Weight Pricing</td><td class="hl">No dimensional weight charges</td><td>Applied on most packages</td><td>Applied on all packages &gt;1 cu ft</td></tr>
+<tr><td>Residential Fees</td><td class="hl">No residential surcharges</td><td>$2&ndash;$4 per delivery</td><td>$4&ndash;$6 per residential delivery</td></tr>
+<tr><td>Volume Discounts</td><td class="hl">Enterprise rates from label one</td><td>Pooled volume &mdash; limited tiers</td><td>Requires 500+ pkgs/week minimum</td></tr>
+<tr><td>Cost per Label</td><td class="hl" style="font-weight:700;color:var(--accent)">$4&ndash;$8 average</td><td style="font-weight:600;color:#dc2626">$7&ndash;$10+ average</td><td style="font-weight:600;color:#dc2626">$9&ndash;$14+ average</td></tr>
 </tbody>
 </table>
 </div>
@@ -708,8 +708,8 @@ ShipZen
 <section class="feat-section" id="features">
 <div class="container">
 <p class="sl c">Integrations</p>
-<h2 class="st c">Works with the carriers and platforms you already use</h2>
-<p class="sd c">Connect your existing carrier accounts and store in minutes &mdash; no upfront fees, you only pay on recovered refunds.</p>
+<h2 class="st c">Guaranteed lowest UPS Ground rates for e-commerce sellers</h2>
+<p class="sd c">Keep more profit with enterprise contract rates &mdash; no minimums, no hidden fees.</p>
 <div class="feat-card fade-in">
 <h3>Integrates seamlessly with the platforms you already use</h3>
 <div class="integ-track">
@@ -731,7 +731,7 @@ ShipZen
 <div class="integ-icon"><svg viewBox="0 0 60 40" aria-label="eBay"><text x="4" y="28" font-family="Arial,sans-serif" font-size="22" font-weight="700"><tspan fill="#E53238">e</tspan><tspan fill="#0064D2">B</tspan><tspan fill="#F5AF02">a</tspan><tspan fill="#86B817">y</tspan></text></svg></div>
 </div>
 </div>
-<p class="feat-desc">Connect ShipZen to your existing e-commerce stack in minutes. Works with Shopify, WooCommerce, BigCommerce, Etsy, Amazon, eBay, and custom integrations via API &mdash; no upfront fees, you only pay on recovered refunds.</p>
+<p class="feat-desc">Connect ShipZen to your existing e-commerce stack in minutes. Works with Shopify, WooCommerce, BigCommerce, Etsy, Amazon, eBay, and custom integrations via API &mdash; no monthly fees, flat-rate pricing on every label.</p>
 </div>
 </div>
 </section>
@@ -743,7 +743,7 @@ ShipZen
 <h2 class="st c">Trusted by e-commerce businesses</h2>
 <div style="height:1.5rem"></div>
 <div class="test-card fade-in">
-<div class="test-quote">We had no idea how much we were leaving on the table. ShipZen plugged into our carrier account and started recovering refunds on late and damaged packages we never would have caught. It's completely hands-off — the money just shows up.</div>
+<div class="test-quote">We were paying $9.40 per label on Pirate Ship. ShipZen got us to $7.10. That's $1,150 back in our pocket every single month — and setup took less than a day.</div>
 <div class="test-author">Sarah M. — Shopify Store Owner</div>
 <div class="test-role">~500 orders/month · Home goods</div>
 </div>
@@ -755,17 +755,20 @@ ShipZen
 <div class="container">
 <p class="sl c">FAQs</p>
 <h2 class="st c">Everything you need to know</h2>
-<p class="sd c">Common questions about ShipZen and automated carrier refund recovery.</p>
+<p class="sd c">Common questions about ShipZen and discounted shipping labels.</p>
 <div class="faq-wrap">
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What exactly does ShipZen do?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen automatically audits your outbound shipments and files carrier claims on your behalf for late deliveries, lost packages, Return-to-Sender (RTS), and damaged shipments. When a claim is approved, the refund &mdash; covering both the shipping cost and, where applicable, the product value &mdash; is credited back to you. It runs entirely in the background.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How much does it cost?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Nothing upfront. ShipZen works on a success-based model &mdash; we take a share only of the refunds we actually recover for you. If we don&rsquo;t recover anything, you don&rsquo;t pay. There&rsquo;s no risk to sign up.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What is your win rate on claims?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">We estimate around a 73% win rate on filed claims going forward. Early on we filed broadly; with a more focused, evidence-backed approach we expect a higher share of claims approved. Your actual results depend on your carrier mix and shipment profile &mdash; your free audit gives a realistic picture.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Which types of refunds do you recover?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Four main categories: automated late-delivery (service-guarantee) refunds, lost-package claims, Return-to-Sender claims, and damaged-package claims. Where eligible we pursue both the original shipping label cost and the product value.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Do I have to change how I ship?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">No. Your carriers, reps, rates, and internal workflow stay exactly the same. ShipZen connects to your existing carrier account and works in the background &mdash; there&rsquo;s nothing new for your team to learn and no disruption to your operation.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How do you connect to my account?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen syncs securely with your existing carrier account and e-commerce platform in minutes. From there we track every package in real time and file claims automatically. Most merchants are fully set up within 24 hours.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How quickly will I see recovered refunds?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Once connected, we begin auditing shipments immediately and file eligible claims as issues are detected. Carrier approval timelines vary by claim type, but recovered funds are credited back to you as they come in &mdash; with no manual work on your end.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Why can&rsquo;t I just file these claims myself?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">You can &mdash; but it&rsquo;s a significant ongoing effort. You&rsquo;d need to monitor every shipment, catch missed delivery guarantees, document damage, and chase each claim through the carrier&rsquo;s portal before tight filing deadlines. In practice most eligible refunds expire unclaimed. ShipZen does all of it automatically.</div></div></div>
-<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Is there a contract or any risk to sign up?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">No contract and no risk. There are no upfront fees and you can cancel anytime. Because we&rsquo;re only paid when we successfully recover refunds, our incentives are fully aligned with yours.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How does ShipZen offer such low shipping rates?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen operates under a direct enterprise-level UPS Ground agreement. We consolidate shipments into predictable, high-frequency lanes so UPS can plan trucks and routes around our volume. We also validate every address before printing, which eliminates correction fees. This combination of lane optimization, clean data, and committed volume qualifies us for enterprise pricing that aggregator platforms simply cannot access.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How is ShipZen different from Pirate Ship, EasyShip, or other aggregators?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Aggregators pool thousands of unrelated sellers onto a shared account. The result is &ldquo;noisy&rdquo; volume &mdash; random origins, random destinations, no repeat patterns. UPS can&rsquo;t optimize routes around that, so the pricing reflects the uncertainty. ShipZen is the opposite: dedicated UPS commitment, predictable lanes, and validated data &mdash; which unlocks enterprise-tier pricing.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How is ShipZen different from 3PLs like ShipStation or ShipHero?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">3PLs handle fragmented volume from thousands of businesses with different packaging, destinations, and timing. They&rsquo;re also structured for multi-carrier flexibility &mdash; optimizing across UPS, FedEx, and USPS simultaneously &mdash; so no single carrier relationship is deep enough for enterprise pricing. ShipZen focuses exclusively on UPS Ground with lane-optimized routes.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Why can&rsquo;t aggregators or 3PLs match our rates?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Enterprise pricing tiers require predictable volume, consistent Ground usage, and repeat lanes. Aggregators can&rsquo;t provide that because their volume is inherently unpredictable. 3PLs can&rsquo;t either because their business model is built around variety and multi-carrier flexibility. ShipZen is structured around the exact behaviors UPS incentivizes.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What shipping services does ShipZen support?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen offers UPS Ground service across the lower 48 states with flat-rate pricing. Our intentional focus on a single carrier and service is what allows us to offer enterprise-tier rates.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What are the weight limits for flat-rate pricing?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Our flat-rate pricing applies to standard UPS Ground-eligible shipments across a broad weight range &mdash; not just lighter packages. Pricing is organized into weight-based tiers, so your rate is determined by which tier your package falls into, not by the specific destination ZIP code within the lower 48 states.<br><br>This means you get the same predictable, flat rate whether you&rsquo;re shipping to California or Connecticut &mdash; and the savings compared to platforms like Pirate Ship, EasyShip, or ShipStation apply across weight classes, not just for small, light packages.<br><br><strong>Note:</strong> Shipments to Alaska, Hawaii, U.S. territories, PO Boxes, and certain remote ZIP codes fall outside our standard flat-rate structure.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Are there any monthly fees or minimums?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">No monthly fees, no volume commitments, no minimums. You pay per label, that&rsquo;s it. Cancel anytime.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What e-commerce platforms does ShipZen integrate with?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen works with Shopify, WooCommerce, BigCommerce, Etsy, Amazon, eBay, and offers API access for custom integrations. Most merchants go live within 24 hours.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What about zone fees or dimensional weight charges?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">None. Our flat-rate pricing is possible because lane optimization averages out distance costs across our network, and address validation removes the hidden fees and risk premiums that make flat rates too risky for aggregator platforms.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Can I see real savings examples?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Absolutely. Across hundreds or thousands of shipments per month, the per-package savings add up to a meaningful difference in your bottom line. Request a custom quote to see your exact savings.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How quickly can I start using ShipZen?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Most merchants can integrate and start printing labels within 24 hours. Just connect your store and start saving immediately.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Is there a contract or cancellation fee?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">No contracts, no cancellation fees. Use ShipZen as much or as little as you want. Cancel anytime.</div></div></div>
 </div>
 </div>
 </section>
@@ -774,11 +777,11 @@ ShipZen
 <section class="cta-section">
 <div class="container">
 <div class="cta-inner fade-in">
-<h2>Start recovering your refunds today.</h2>
-<p>Get your free audit and we&rsquo;ll use your shipping data to build a clean, side-by-side estimate of what carriers owe you. No upfront fees, no risk.</p>
+<h2>Start saving on every shipment today.</h2>
+<p>You&rsquo;re still shipping UPS Ground with full tracking and the same delivery network. The only thing that changes is what you pay.</p>
 <div class="cta-buttons">
-<a href="#contact" class="btn-cta-w">Get Your Free Audit</a>
-<a href="#how-it-works" class="btn-cta-ghost">See How It Works</a>
+<a href="#contact" class="btn-cta-w">Get Your Savings Quote</a>
+<a href="#how-it-works" class="btn-cta-ghost">Learn How It Works</a>
 </div>
 </div>
 </div>
@@ -793,7 +796,7 @@ ShipZen
 <svg width="22" height="22" viewBox="0 0 40 40" fill="none"><path d="M4,2L36,2Q39,2 39,5L39,14L7,29L1,14L1,5Q1,2 4,2Z" fill="#6b8dd6"/><path d="M33,11L39,26L39,35Q39,38 36,38L4,38Q1,38 1,35L1,26Z" fill="#00b4d8" opacity=".80"/></svg>
 ShipZen
 </div>
-<p class="footer-desc">Automated carrier refund recovery for e-commerce sellers. We audit your shipments and file claims for late, lost, RTS, and damaged packages &mdash; success-based, no upfront fees.</p>
+<p class="footer-desc">Enterprise UPS Ground rates for e-commerce sellers. No contracts, no minimums, no hidden fees.</p>
 </div>
 <div class="footer-col">
 <h4>Product</h4>
@@ -839,9 +842,8 @@ function tFaq(b){var i=b.parentElement,o=i.classList.contains('open');document.q
   var yearlyLoss=document.getElementById('yearly-loss');
   var hiddenShipments=document.getElementById('monthly_shipments');
   function calcSavings(pkgs){
-    // conservative estimate of recoverable carrier refunds per package/month
-    // (blend of late-delivery, lost, RTS & damaged claims). Clearly an estimate.
-    var monthly=Math.round(pkgs*0.60);
+    // avg $1.50 savings per label (conservative mid-range of $1-$2)
+    var monthly=Math.round(pkgs*1.50);
     var yearly=monthly*12;
     return{monthly:monthly,yearly:yearly};
   }
@@ -858,7 +860,7 @@ function tFaq(b){var i=b.parentElement,o=i.classList.contains('open');document.q
     pkgDisplay.textContent=pkgs>=5000?'5,000+':pkgs.toLocaleString();
     var s=calcSavings(pkgs);
     monthlyLoss.textContent=fmt(s.monthly)+'/mo';
-    yearlyLoss.textContent='= '+fmt(s.yearly)+'/year in potentially recoverable refunds';
+    yearlyLoss.textContent='= '+fmt(s.yearly)+'/year staying with your current carrier';
     hiddenShipments.value=updateBucket(pkgs);
   }
   slider.addEventListener('input',update);
@@ -879,9 +881,9 @@ if(errs.length){m.className='form-msg err';m.textContent='Please enter a valid e
 b.disabled=true;b.textContent='Submitting...';
 fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
 .then(function(r){return r.json().then(function(j){return{ok:r.ok,data:j}})})
-.then(function(r){if(r.ok){m.className='form-msg ok';m.textContent='You\'re in. We\'ll send your free refund-recovery audit shortly.';document.getElementById('lead-form').reset()}else{m.className='form-msg err';m.textContent='Oops! Something went wrong.'}})
+.then(function(r){if(r.ok){m.className='form-msg ok';m.textContent='You\'re in. We\'ll send your custom rate breakdown shortly.';document.getElementById('lead-form').reset()}else{m.className='form-msg err';m.textContent='Oops! Something went wrong.'}})
 .catch(function(){m.className='form-msg err';m.textContent='Oops! Something went wrong.'})
-.finally(function(){b.disabled=false;b.innerHTML='\uD83D\uDCE6 Get My Free Audit'});
+.finally(function(){b.disabled=false;b.innerHTML='\uD83D\uDCE6 Get Your Savings Quote'});
 });
 
 /* Intersection observer for fade-in */
@@ -1097,7 +1099,7 @@ ctx.fillStyle='rgba(16,185,129,.75)';
 ctx.fillText(totalSaved.toFixed(0)+'+',txtX,txtY);
 ctx.font='600 '+Math.round(w*.028)+'px Inter,system-ui,sans-serif';
 ctx.fillStyle='rgba(37,99,235,.3)';
-ctx.fillText('REFUNDS RECOVERED',txtX,txtY+w*.075);
+ctx.fillText('PACKAGES OPTIMIZED',txtX,txtY+w*.075);
 ctx.restore();
 requestAnimationFrame(draw);
 }
@@ -1297,11 +1299,11 @@ ctx.fillText('ShipZen',lx+colW/2,topY+h*.06);
 var priceY=topY+h*.25;
 ctx.font='800 '+Math.round(w*.065)+'px Inter,system-ui,sans-serif';
 ctx.fillStyle='rgba(37,99,235,.65)';
-ctx.fillText('~73%',lx+colW/2,priceY);
+ctx.fillText('Flat Rate',lx+colW/2,priceY);
 ctx.font='500 '+Math.round(w*.025)+'px Inter,system-ui,sans-serif';
 ctx.fillStyle='rgba(37,99,235,.3)';
-ctx.fillText('est. claim win rate',lx+colW/2,priceY+h*.06);
-var checks=['Late refunds','Lost packages','RTS claims','Damaged goods'];
+ctx.fillText('simple, predictable',lx+colW/2,priceY+h*.06);
+var checks=['No zone fees','No DIM weight','No surcharges','No monthly fee'];
 for(var i=0;i<checks.length;i++){
 var cy=priceY+h*.14+i*h*.08;
 ctx.font='500 '+Math.round(w*.028)+'px Inter,system-ui,sans-serif';
@@ -1320,11 +1322,11 @@ ctx.font='700 '+Math.round(w*.035)+'px Inter,system-ui,sans-serif';
 ctx.fillStyle='rgba(220,38,38,.4)';ctx.textAlign='center';
 ctx.fillText('Others',rx+colW/2,topY+h*.06);
 var fees=[
-{label:'Late refunds',val:'unclaimed',y:0},
-{label:'Lost packages',val:'unfiled',y:1},
-{label:'RTS claims',val:'missed',y:2},
-{label:'Damaged goods',val:'ignored',y:3},
-{label:'Deadlines',val:'expired',y:4}
+{label:'Base rate',val:'varies',y:0},
+{label:'Zone surcharge',val:'+ extra',y:1},
+{label:'Fuel surcharge',val:'+ extra',y:2},
+{label:'DIM weight adj.',val:'+ extra',y:3},
+{label:'Residential fee',val:'+ extra',y:4}
 ];
 var startY=topY+h*.16;
 for(var i=0;i<fees.length;i++){
@@ -1377,8 +1379,8 @@ BOOK_HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Book a Free Refund Audit — ShipZen</title>
-<meta name="description" content="Find out exactly how much carriers owe you in unclaimed refunds. Book a free 15-minute audit call with ShipZen.">
+<title>Book a Free Savings Call — ShipZen</title>
+<meta name="description" content="Find out exactly how much you can save on UPS Ground shipping. Book a free 15-minute call with ShipZen.">
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1464,37 +1466,37 @@ ShipZen
   <section class="hero">
     <div class="hero-badge">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-      Free 15-Minute Refund Audit
+      Free 15-Minute Savings Call
     </div>
-    <h1>Carriers owe you <span class="hl">refunds</span><br>you're not claiming.</h1>
-    <p class="hero-sub">Every late delivery, lost package, Return-to-Sender, and damaged shipment is money the carrier owes you — and won't pay automatically. ShipZen audits your shipments and files the claims for you. No upfront fees, success-based. Book a free call and we'll show you exactly what's recoverable.</p>
+    <h1>Stop leaving <span class="hl">$1–$2</span> on the table<br>every single shipment.</h1>
+    <p class="hero-sub">ShipZen gives e-commerce sellers enterprise UPS Ground rates — the same pricing tier as companies shipping millions of packages a year. No contracts, no minimums. Book a free call and we'll show you exactly what you'd save.</p>
     <div class="trust-row">
-      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No upfront fees</div>
-      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No risk to sign up</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No setup fees</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No contracts</div>
       <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Cancel anytime</div>
       <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Live in under 24 hours</div>
     </div>
   </section>
   <div class="savings-strip">
-    <div class="sav-item"><div class="sav-val">~73<span class="accent">%</span></div><div class="sav-label">estimated claim win rate</div></div>
+    <div class="sav-item"><div class="sav-val">$1–$2</div><div class="sav-label">saved per label on average</div></div>
     <div class="sav-divider"></div>
-    <div class="sav-item"><div class="sav-val"><span class="accent">late</span>, <span class="accent">lost</span>, RTS &amp; damaged</div><div class="sav-label">claim types we recover</div></div>
+    <div class="sav-item"><div class="sav-val"><span class="accent">$500</span>–<span class="accent">$5,000</span></div><div class="sav-label">back per month at 500–2,500 shipments</div></div>
     <div class="sav-divider"></div>
-    <div class="sav-item"><div class="sav-val">$0</div><div class="sav-label">upfront — success-based</div></div>
+    <div class="sav-item"><div class="sav-val">48</div><div class="sav-label">states, flat-rate</div></div>
     <div class="sav-divider"></div>
-    <div class="sav-item"><div class="sav-val">2</div><div class="sav-label">recovered: shipping + product value</div></div>
+    <div class="sav-item"><div class="sav-val">$0</div><div class="sav-label">hidden fees or zone charges</div></div>
   </div>
   <div class="cal-section">
     <div class="cal-header">
       <h2>📅 Pick a time that works for you</h2>
-      <p>15 minutes. We'll pull your shipping data, show you exactly what carriers owe you, and answer any questions.</p>
+      <p>15 minutes. We'll pull your shipping data, show you your exact savings, and answer any questions.</p>
     </div>
     <!-- REPLACE THE URL BELOW WITH YOUR REAL CALENDLY LINK -->
     <div class="calendly-inline-widget" data-url="https://calendly.com/shipzen/30min?hide_gdpr_banner=1&primary_color=1e3a8a"></div>
   </div>
   <div class="proof-section">
     <div class="proof-card">
-      <div class="proof-quote">We had no idea how much we were leaving on the table. ShipZen plugged into our carrier account and started recovering refunds on late and damaged packages we never would have caught. It's completely hands-off — the money just shows up.</div>
+      <div class="proof-quote">We were paying $9.40 per label on Pirate Ship. ShipZen got us to $7.10. That's $1,150 back in our pocket every single month — and setup took less than a day.</div>
       <div class="proof-author">Sarah M. — Shopify Store Owner</div>
       <div class="proof-role">~500 orders/month · Home goods</div>
     </div>
@@ -1503,16 +1505,16 @@ ShipZen
     <div class="faq-title">Common questions</div>
     <div class="faq-list">
       <div class="faq-item">
-        <button class="faq-q" onclick="tFaq(this)">What exactly does ShipZen recover?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="faq-ans"><div class="faq-ans-inner">Carrier refunds you're owed but rarely get automatically: late-delivery (service-guarantee) refunds, lost packages, Return-to-Sender (RTS), and damaged shipments. Where eligible we recover both the original shipping cost and the product value — and we file every claim for you.</div></div>
+        <button class="faq-q" onclick="tFaq(this)">Is this just like Pirate Ship or EasyShip?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">No. Aggregators like Pirate Ship pool thousands of unrelated sellers — UPS can't optimize routes around that noise, so pricing reflects the uncertainty. ShipZen holds a direct enterprise UPS Ground contract with dedicated, predictable lanes. That's what unlocks pricing tiers aggregators simply can't reach.</div></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="tFaq(this)">What does it cost, and is there any risk?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="faq-ans"><div class="faq-ans-inner">Nothing upfront. ShipZen is success-based — we take a share only of the refunds we actually recover for you. If we don't recover anything, you don't pay. No contracts, no minimums, cancel anytime.</div></div>
+        <button class="faq-q" onclick="tFaq(this)">Do I have to switch carriers or change my workflow?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">You're still shipping UPS Ground with full tracking and the same delivery network. The only thing that changes is what you pay. We integrate with Shopify, WooCommerce, BigCommerce, Etsy, Amazon, eBay, and more — most sellers are live within 24 hours.</div></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="tFaq(this)">Do I have to change how I ship?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="faq-ans"><div class="faq-ans-inner">No. Your carriers, reps, rates, and workflow stay exactly the same. ShipZen connects to your existing carrier account and works in the background. We integrate with Shopify, WooCommerce, BigCommerce, Etsy, Amazon, eBay, and more — most sellers are live within 24 hours.</div></div>
+        <button class="faq-q" onclick="tFaq(this)">Are there volume minimums or long-term contracts?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">None. No monthly fees, no minimums, no cancellation fees. You pay per label, that's it. Cancel anytime.</div></div>
       </div>
     </div>
   </div>

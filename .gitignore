@@ -1,6 +1,6 @@
-__pycache__/
-*.pyc
+.claude/
 *.db
 .env
-.claude/
+*.pyc
+__pycache__/
 .venv/
