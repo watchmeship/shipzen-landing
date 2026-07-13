@@ -172,8 +172,21 @@ def admin_leads():
 
 
 @app.route("/")
+@app.route("/slideshow")
 def landing():
-    return render_template_string(LANDING_HTML)
+    """Serve the temporary Discovery Deck while the main site is rebuilt."""
+    return render_template_string(SLIDESHOW_HTML, slides=SLIDE_DATA)
+
+
+@app.route("/main-preview")
+def main_preview():
+    """Private-to-search preview of the in-progress refund-recovery homepage."""
+    preview_html = LANDING_HTML.replace(
+        "<head>",
+        '<head>\n<meta name="robots" content="noindex,nofollow">',
+        1,
+    )
+    return render_template_string(preview_html)
 
 
 @app.route("/book")
@@ -183,7 +196,10 @@ def book():
 
 @app.route("/version")
 def version():
-    return jsonify({"version": "2026-04-23", "routes": ["/", "/book", "/admin/leads", "/api/lead"]})
+    return jsonify({
+        "version": "2026-07-13-slideshow",
+        "routes": ["/", "/slideshow", "/main-preview", "/book", "/admin/leads", "/api/lead"],
+    })
 
 
 @app.route("/api/lead", methods=["POST"])
@@ -1524,6 +1540,462 @@ ShipZen
 <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 <script>
 function tFaq(btn){var item=btn.closest('.faq-item');var wasOpen=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(function(el){el.classList.remove('open');});if(!wasOpen)item.classList.add('open');}
+</script>
+</body>
+</html>"""
+
+
+# ---------------------------------------------------------------------------
+# Temporary Discovery Deck homepage
+# Source PDF: ShipZen Discovery Deck v1 (3), supplied by Jayson on 2026-07-13.
+# The rendered slide images preserve the deck exactly; transcripts keep its
+# business-critical copy accessible to search engines and assistive technology.
+# ---------------------------------------------------------------------------
+
+SLIDE_DATA = [
+    {
+        "src": "/static/slides/shipzen-discovery-01.webp",
+        "title": "ShipZen — Automated Carrier Auditing & Claims",
+        "transcript": (
+            "ShipZen. Automated Carrier Auditing & Claims. We recover the shipping money carriers don't want you to know about. "
+            "By automating the claims process for all shipping exceptions, we ensure you are fully reimbursed for the cost of your goods "
+            "and the shipping label. Start Your Free Audit. No upfront fees. No risk."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-02.webp",
+        "title": "Who We Are",
+        "transcript": (
+            "Who We Are. We find the shipping savings carriers hide from you, with no upfront fees and no risk to start. "
+            "Built and run by people who have worked inside the claims departments at the major couriers. We don't guess how to get a claim approved; "
+            "we know, because we used to approve and deny them. ShipZen offers a cleaner path to recovering money across your entire fulfillment operation."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-03.webp",
+        "title": "The Insider Advantage",
+        "transcript": (
+            "The Insider Advantage. We don't guess how to get a claim approved. We know, because we used to be the ones denying them. "
+            "The Carrier Playbook: built by former claims department insiders from major couriers. Zero Risk, Zero Upfront Fees. "
+            "Total Operation Recovery: a cleaner, hands-off path to recovering lost capital across your entire fulfillment operation."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-04.webp",
+        "title": "Why In-House Claims Fail",
+        "transcript": (
+            "Why In-House Claims Fail. Hidden Rules: carriers won't automatically refund you. Strict Deadlines: every claim type has a tight expiration window. "
+            "Insider Rules: each carrier has complex, unwritten proof requirements. High Costs: in-house filing requires dedicated staff, making it expensive, slow, and error-prone."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-05.webp",
+        "title": "Comprehensive Recovery",
+        "transcript": (
+            "Comprehensive Recovery. Most providers only chase late or lost-in-transit shipments. We go further and recover across every category: "
+            "Lost Packages, Return to Sender, Late Deliveries, Damaged Goods, and Not Received. More categories covered means more of your money recovered."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-06.webp",
+        "title": "The AI & Human Advantage",
+        "transcript": (
+            "The AI & Human Advantage. Most competitors run on AI or automation alone. ShipZen runs a powerful two-layer system. "
+            "Layer 1: Automation catches every eligible shipping exception in real time. Layer 2: Human Experts, including former carrier reps, review filings, "
+            "catch errors AI misses, and manually build the strongest possible case for approval."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-07.webp",
+        "title": "Our Win Rate",
+        "transcript": (
+            "Our Win Rate. 73% Overall Win Rate across all claim types we file. 84% Delayed & Lost, our strongest recovery category. "
+            "Results are driven by our two-layer process: insider knowledge paired with automation that never misses an eligible claim. "
+            "We recover the total cost impact for your business, including product value and the original shipping label cost."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-08.webp",
+        "title": "Late-Shipment Automation",
+        "transcript": (
+            "Late-Shipment Automation. Missed Commitments equal Full Refunds. Guaranteed Services include time-definite services such as UPS Next Day Air, "
+            "FedEx Overnight, and USPS Priority Express. The Minute Rule: if a carrier misses the exact commitment time, even by a single minute, "
+            "you are entitled to a full refund. Hands-Free Recovery tracks every package and files claims automatically."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-09.webp",
+        "title": "Seamless Integration Roadmap",
+        "transcript": (
+            "Seamless Integration Roadmap. Integrating ShipZen requires zero heavy lifting from IT or operations. Fast, Secure Setup syncs directly with existing "
+            "carrier accounts via API with no coding. Zero Disruption means no changes to carriers, representatives, rates, or workflows. "
+            "Fully Hands-Off means the engine audits, flags, and files claims automatically."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-10.webp",
+        "title": "Success-Based Pricing",
+        "transcript": (
+            "Success-Based Pricing. Completely hands-off and no risk: no upfront fees and no subscriptions. No Risk: if we don't recover anything, you pay nothing. "
+            "50/50 Revenue Split: you receive 50% of every refund we recover. Simple Invoicing: ShipZen invoices the other 50% at the end of the month as its fee. "
+            "Our incentive is perfectly aligned with yours."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-11.webp",
+        "title": "What Recovery Looks Like for You",
+        "transcript": (
+            "What Recovery Looks Like for You. Automated Credits are returned directly to your accounts. Total Visibility provides clear, ongoing reporting of "
+            "exactly what ShipZen recovered and where it originated. Bottom Line Impact puts money that was already rightfully yours back onto your bottom line."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-12.webp",
+        "title": "Your Shipping Profile",
+        "transcript": (
+            "Your Shipping Profile. To build your custom recovery model, we start with discovery details: carrier mix, total monthly package volume, "
+            "service breakdown by percentage of volume, and the pain points hitting hardest, including delayed, lost, Return to Sender, and damaged shipments."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-13.webp",
+        "title": "Let's Find Your Hidden Refunds",
+        "transcript": (
+            "Let's find your hidden refunds. Your carriers are holding money that belongs to you, and they're counting on you not to ask for it. "
+            "ShipZen recovers it with insider expertise, a 73% win rate, and zero risk. All we need to get started is a quick look at your shipping volume and carriers."
+        ),
+    },
+    {
+        "src": "/static/slides/shipzen-discovery-14.webp",
+        "title": "Case Study — E-Commerce Impact Analysis",
+        "transcript": (
+            "Case Study: E-Commerce Impact Analysis. A recent high-volume e-commerce client achieved a 75.4% Dollar Recovery Rate, "
+            "95.8% In-Transit Success, and a 21.5% Shipping Multiplier from refunded shipping costs. The Stabilization Effect prevents claim fatigue "
+            "during peak-volume months and ensures no money expires unfiled."
+        ),
+    },
+]
+
+
+SLIDESHOW_HTML = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ShipZen — Automated Carrier Auditing & Claims</title>
+<meta name="description" content="See how ShipZen audits carrier mistakes and recovers refunds across late, lost, damaged, Return-to-Sender, and not-received shipments.">
+<link rel="canonical" href="https://shipzen.co/">
+<meta name="theme-color" content="#08111f">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#08111f;
+  --surface:#101d30;
+  --ink:#f8fafc;
+  --muted:#a8b5c7;
+  --accent:#7bb7ff;
+  --control:rgba(8,17,31,.78);
+  --border:rgba(255,255,255,.16);
+  --shadow:0 24px 80px rgba(0,0,0,.48);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+button,a{font:inherit}
+button{color:inherit}
+a{color:inherit}
+.deck-shell{
+  min-height:100vh;
+  min-height:100svh;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(45,110,180,.18),transparent 32rem),
+    radial-gradient(circle at 82% 86%,rgba(0,180,216,.12),transparent 32rem),
+    var(--bg);
+}
+.topbar{
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:max(.65rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right)) .65rem max(1rem,env(safe-area-inset-left));
+  border-bottom:1px solid var(--border);
+  background:rgba(8,17,31,.72);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  z-index:20;
+}
+.brand{display:flex;align-items:center;gap:.65rem;font-weight:800;letter-spacing:-.02em}
+.brand-mark{width:28px;height:28px;display:block}
+.deck-label{color:var(--muted);font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.top-actions{display:flex;align-items:center;gap:.5rem}
+.top-link,.audit-link{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  text-decoration:none;
+  font-weight:750;
+  white-space:nowrap;
+}
+.top-link{padding:.65rem 1rem;border:1px solid var(--border);background:rgba(255,255,255,.05);font-size:.84rem}
+.top-link:hover,.top-link:focus-visible{background:rgba(255,255,255,.11)}
+.audit-link{padding:.7rem 1.1rem;background:#fff;color:#08111f;font-size:.86rem}
+.audit-link:hover,.audit-link:focus-visible{background:#dfeeff}
+.stage{
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(.6rem,2vw,1.25rem);
+  touch-action:pan-y;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.slide-frame{
+  position:relative;
+  width:min(100%,calc((100svh - 148px) * 16 / 9));
+  max-height:calc(100svh - 148px);
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:clamp(7px,1vw,14px);
+  box-shadow:var(--shadow);
+  isolation:isolate;
+}
+.slide{
+  position:absolute;
+  inset:0;
+  margin:0;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .42s ease,visibility .42s ease;
+}
+.slide[aria-hidden="false"]{opacity:1;visibility:visible;pointer-events:auto}
+.slide img{width:100%;height:100%;display:block;object-fit:contain;background:#fff}
+.sr-only{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  padding:0!important;
+  margin:-1px!important;
+  overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;
+  border:0!important;
+}
+.controls{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  gap:1rem;
+  min-height:72px;
+  padding:.65rem max(1rem,env(safe-area-inset-right)) max(.65rem,env(safe-area-inset-bottom)) max(1rem,env(safe-area-inset-left));
+  border-top:1px solid var(--border);
+  background:rgba(8,17,31,.74);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  z-index:20;
+}
+.progress-wrap{min-width:0;display:flex;align-items:center;gap:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress-track{height:4px;flex:1;max-width:260px;overflow:hidden;background:rgba(255,255,255,.12);border-radius:99px}
+.progress-bar{height:100%;width:7.142857%;background:var(--accent);border-radius:99px;transition:width .32s ease}
+.counter{font-size:.82rem;font-weight:750;white-space:nowrap}
+.transport{display:flex;align-items:center;justify-content:center;gap:.5rem}
+.control-btn{
+  width:46px;
+  height:46px;
+  border:1px solid var(--border);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  background:var(--control);
+  transition:background .18s ease,transform .18s ease,border-color .18s ease;
+}
+.control-btn:hover,.control-btn:focus-visible{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.32);transform:translateY(-1px)}
+.control-btn:focus-visible,.top-link:focus-visible,.audit-link:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.control-btn svg{width:20px;height:20px;display:block}
+.pause-icon,.play-icon{display:none}
+.is-playing .pause-icon{display:block}
+:not(.is-playing)>.play-icon{display:block}
+.secondary{display:flex;align-items:center;justify-content:flex-end;gap:.5rem;color:var(--muted);font-size:.76rem}
+.keyboard-hint{white-space:nowrap}
+@media(max-width:720px){
+  .deck-label,.keyboard-hint,.top-link span{display:none}
+  .topbar{min-height:54px}
+  .brand{font-size:.94rem}
+  .slide-frame{width:100%;max-height:calc(100svh - 142px)}
+  .controls{grid-template-columns:1fr auto;min-height:70px}
+  .transport{grid-column:2;grid-row:1}
+  .progress-wrap{grid-column:1;grid-row:1}
+  .secondary{display:none}
+  .progress-track{max-width:120px}
+  .audit-link{padding:.65rem .9rem;font-size:.8rem}
+}
+@media(max-width:430px){
+  .top-link{display:none}
+  .controls{gap:.55rem;padding-left:.65rem;padding-right:.65rem}
+  .transport{gap:.35rem}
+  .control-btn{width:44px;height:44px}
+  .counter{font-size:.76rem}
+}
+@media(prefers-reduced-motion: reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+@media print{
+  html,body{height:auto;overflow:visible;background:#fff}
+  .topbar,.controls{display:none}
+  .deck-shell{display:block;background:#fff}
+  .stage{display:block;padding:0}
+  .slide-frame{width:100%;max-height:none;aspect-ratio:auto;overflow:visible;border:0;box-shadow:none}
+  .slide{position:relative;opacity:1;visibility:visible;break-after:page}
+  .slide img{width:100%;height:auto}
+}
+</style>
+</head>
+<body>
+<main class="deck-shell" data-shipzen-slideshow>
+  <header class="topbar">
+    <div class="brand" aria-label="ShipZen">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 2h32c1.7 0 3 1.3 3 3v9L7 29 1 14V5c0-1.7 1.3-3 3-3Z" fill="#7bb7ff"/><path d="m33 11 6 15v9c0 1.7-1.3 3-3 3H4c-1.7 0-3-1.3-3-3v-9Z" fill="#00b4d8" opacity=".9"/></svg>
+      <span>ShipZen</span>
+      <span class="deck-label">Discovery Deck</span>
+    </div>
+    <div class="top-actions">
+      <a class="top-link" href="/static/shipzen-discovery-deck.pdf" download><span>Download PDF</span><span aria-hidden="true">↓</span></a>
+      <a class="audit-link" href="/book">Start Your Free Audit</a>
+    </div>
+  </header>
+
+  <section class="stage" aria-label="ShipZen Discovery Deck">
+    <div class="slide-frame" role="region" aria-roledescription="carousel" aria-label="ShipZen presentation">
+      {% for slide in slides %}
+      <figure class="slide" data-slide="{{ loop.index0 }}" aria-hidden="{{ 'false' if loop.first else 'true' }}">
+        <img src="{{ slide.src }}" alt="Slide {{ loop.index }} of {{ slides|length }}: {{ slide.title }}" width="1920" height="1080" loading="{{ 'eager' if loop.index <= 2 else 'lazy' }}"{% if loop.first %} fetchpriority="high"{% endif %}>
+        <figcaption class="sr-only">{{ slide.transcript|safe }}</figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </section>
+
+  <footer class="controls">
+    <div class="progress-wrap">
+      <span class="counter" aria-live="polite"><span id="current-slide">1</span> / {{ slides|length }}</span>
+      <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progress-bar"></div></div>
+    </div>
+    <div class="transport">
+      <button class="control-btn" id="previous-slide" type="button" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button class="control-btn is-playing" id="toggle-play" type="button" aria-label="Pause slideshow">
+        <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+        <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>
+      </button>
+      <button class="control-btn" id="next-slide" type="button" aria-label="Next slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="secondary"><span class="keyboard-hint">Use arrow keys or swipe</span></div>
+  </footer>
+</main>
+<script>
+(function(){
+  'use strict';
+  var root=document.querySelector('[data-shipzen-slideshow]');
+  var stage=root.querySelector('.stage');
+  var slides=Array.prototype.slice.call(root.querySelectorAll('.slide'));
+  var currentEl=document.getElementById('current-slide');
+  var progressEl=document.getElementById('progress-bar');
+  var previousButton=document.getElementById('previous-slide');
+  var nextButton=document.getElementById('next-slide');
+  var playButton=document.getElementById('toggle-play');
+  var reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stored=parseInt(window.localStorage.getItem('shipzen-current-slide')||'0',10);
+  var current=Number.isFinite(stored)&&stored>=0&&stored<slides.length?stored:0;
+  var playing=!reducedMotion;
+  var timer=null;
+  var touchStartX=null;
+  var autoplayDelay=10000;
+
+  function clearTimer(){
+    if(timer){window.clearTimeout(timer);timer=null;}
+  }
+
+  function schedule(){
+    clearTimer();
+    if(playing&&!document.hidden){
+      timer=window.setTimeout(function(){show(current+1);},autoplayDelay);
+    }
+  }
+
+  function syncPlayButton(){
+    playButton.classList.toggle('is-playing',playing);
+    playButton.setAttribute('aria-label',playing?'Pause slideshow':'Play slideshow');
+  }
+
+  function show(next){
+    current=(next+slides.length)%slides.length;
+    slides.forEach(function(slide,index){
+      var active=index===current;
+      slide.classList.toggle('is-active',active);
+      slide.setAttribute('aria-hidden',active?'false':'true');
+    });
+    currentEl.textContent=String(current+1);
+    progressEl.style.width=String(((current+1)/slides.length)*100)+'%';
+    window.localStorage.setItem('shipzen-current-slide',String(current));
+    var preload=slides[(current+1)%slides.length].querySelector('img');
+    if(preload)preload.loading='eager';
+    schedule();
+  }
+
+  function togglePlay(){
+    playing=!playing;
+    syncPlayButton();
+    schedule();
+  }
+
+  previousButton.addEventListener('click',function(){show(current-1);});
+  nextButton.addEventListener('click',function(){show(current+1);});
+  playButton.addEventListener('click',togglePlay);
+
+  document.addEventListener('keydown',function(event){
+    if(event.target&&/input|textarea|select/i.test(event.target.tagName))return;
+    if(event.key==='ArrowRight'||event.key==='PageDown'){event.preventDefault();show(current+1);}
+    if(event.key==='ArrowLeft'||event.key==='PageUp'){event.preventDefault();show(current-1);}
+    if(event.key==='Home'){event.preventDefault();show(0);}
+    if(event.key==='End'){event.preventDefault();show(slides.length-1);}
+    if(event.key===' '){event.preventDefault();togglePlay();}
+  });
+
+  stage.addEventListener('touchstart',function(event){
+    touchStartX=event.changedTouches[0].clientX;
+    clearTimer();
+  },{passive:true});
+  stage.addEventListener('touchend',function(event){
+    if(touchStartX===null)return;
+    var distance=event.changedTouches[0].clientX-touchStartX;
+    touchStartX=null;
+    if(Math.abs(distance)>48)show(distance<0?current+1:current-1);
+    else schedule();
+  },{passive:true});
+
+  stage.addEventListener('mouseenter',clearTimer);
+  stage.addEventListener('mouseleave',schedule);
+  root.addEventListener('focusin',clearTimer);
+  root.addEventListener('focusout',function(event){
+    if(!root.contains(event.relatedTarget))schedule();
+  });
+  document.addEventListener('visibilitychange',schedule);
+
+  syncPlayButton();
+  show(current);
+})();
 </script>
 </body>
 </html>"""
