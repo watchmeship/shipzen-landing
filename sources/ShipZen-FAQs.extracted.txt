@@ -1,0 +1,163 @@
+    ShipZen
+
+    FAQ & Sales Objection Handling
+Core promise
+
+ShipZen helps shippers recover money from carrier service failures, lost or damaged packages, delivered-not-received
+issues, return-to-sender errors, and billing mistakes. The model is success-based: no upfront fees, no subscriptions,
+and ShipZen only gets paid when money is recovered.
+
+
+
+
+    Positioning summary
+What prospects care about               ShipZen answer                              Sales emphasis
+
+
+Risk                                    No upfront fees or subscription.            If nothing is recovered, the client pays
+                                                                                    nothing.
+
+
+Time                                    Hands-off carrier account sync and          No new daily workflow for ops or finance.
+                                        automated filing.
+
+
+Recovery scope                          More than late deliveries: lost, damaged,   Most vendors and in-house teams miss
+                                        DNR, RTS, billing errors, surcharges,       categories beyond obvious late/lost
+                                        duplicate charges, and                      cases.
+                                        dimensional-weight issues.
+
+
+Differentiation                         Automation plus former carrier claims       AI catches volume; humans handle
+                                        experts.                                    nuance, appeals, proof, and carrier
+                                                                                    pushback.
+
+
+Control                                 Refunds or credits go directly to the       ShipZen invoices its fee after the client
+                                        customer carrier account.                   receives the credit.
+
+
+
+
+    Contents
+    ●​    1. Website-Ready FAQ - Short Version
+    ●​    2. Expanded FAQ - Sales & Customer-Facing Detail
+    ●​    3. Sales Objection Handling
+    ●​    4. Discovery Questions to Pair With the FAQ
+    ●​    5. Compliance & Proof Checklist
+    ●​    6. Source Notes
+1. Website-Ready FAQ - Short Version
+Use this section for the public website accordion. Keep answers short, confident, and easy for a prospect
+to scan.
+
+What does ShipZen do?
+ShipZen audits your carrier shipments and files eligible claims to recover money from service failures, lost or
+damaged packages, delivered-not-received issues, return-to-sender errors, and billing mistakes. We help
+recover both shipping cost and product value where applicable.
+
+
+
+How is ShipZen different from basic claims software?
+Most tools rely on automation only. ShipZen combines real-time audit automation with human claims experts
+who understand how carriers review, deny, and approve claims.
+
+
+
+Do we need to switch carriers?
+No. ShipZen works with your existing carrier accounts, negotiated rates, reps, and fulfillment workflow.
+
+
+
+How long does setup take?
+Setup is fast and low-lift. We securely connect to your existing carrier accounts and begin auditing eligible
+shipments without requiring your team to change how it ships.
+
+
+
+What carriers do you support?
+ShipZen can support major parcel carriers such as UPS and FedEx, depending on your account setup, service
+types, and available claim paths.
+
+
+
+What shipping issues can you recover for?
+We audit for late deliveries, lost packages, damaged goods, delivered-not-received cases, return-to-sender
+issues, duplicate charges, dimensional-weight errors, incorrect surcharges, and other recoverable billing
+mistakes.
+​
+Can ShipZen recover the product value too, or only the shipping cost?
+
+Yes, when the claim type and carrier rules allow it. For late-delivery or service-guarantee claims, recovery
+usually applies to the shipping charge only. For lost or damaged shipments, ShipZen can pursue
+product-value recovery when the carrier allows it, but reimbursement depends on declared value, carrier
+liability limits, and proof such as invoice value, replacement cost, item details, photos, or customer
+documentation. For UPS and FedEx, the first $100 of shipment value is typically covered under standard
+liability. If the item is worth more than $100 but no higher declared value was added and paid for at the
+time of shipment, the carrier may limit product-value reimbursement to $100.
+
+Can you recover product value too?
+Yes, when the claim type and carrier rules allow it. Product-value recovery usually requires proof such as
+invoice value, replacement cost, item details, photos, or customer documentation.
+How far back can you audit?
+It depends on the carrier and claim type. Late-delivery refunds often have very short windows, while lost,
+damaged, and billing claims may allow longer windows. ShipZen prioritizes real-time filing so opportunities do
+not expire.
+
+
+
+Does filing claims hurt our carrier relationship?
+No. Eligible refunds and credits are part of carrier agreements and service policies. ShipZen files professionally
+and within the applicable rules.
+
+
+
+What if we signed a late-delivery waiver?
+A late-delivery waiver may limit service-guarantee refunds, but it usually does not eliminate other recovery
+categories such as lost packages, damage, duplicate charges, invoice errors, dimensional-weight mistakes, or
+certain surcharge disputes.
+
+
+
+How much does ShipZen cost?
+ShipZen uses success-based pricing. There are no upfront fees and no subscriptions. If we do not recover
+money, you do not pay us.
+
+
+
+How does the 50/50 split work?
+The carrier credits the full refund to your account. ShipZen invoices for 50% of the successfully recovered
+amount at the end of the month.
+
+
+
+Do you take the refund before we receive it?
+No. Refunds and credits go directly to your carrier account first. ShipZen invoices separately after the recovery
+is received.
+
+
+
+How do we see what was recovered?
+You receive transparent reporting that shows what was recovered, where it came from, and the claim category
+behind each credit.
+
+
+
+Is our data secure?
+ShipZen uses secure carrier-account connections and only accesses the data needed to audit shipments,
+validate exceptions, and file claims. We do not sell customer data.
+
+
+
+What does our team need to do after setup?
+Very little. ShipZen runs in the background: monitoring shipments, flagging exceptions, preparing claims, filing
+eligible recoveries, and tracking outcomes.
+What happens if a claim is denied?
+When a valid claim is denied, ShipZen can review the reason, correct documentation gaps, and appeal or refile
+when the carrier rules allow it.
+
+
+
+How do we get started?
+We start with a quick look at your shipping volume, carrier mix, service types, and biggest pain points. From
+there, ShipZen estimates recovery opportunities and confirms the best setup path.
+

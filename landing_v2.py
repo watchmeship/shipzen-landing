@@ -172,9 +172,14 @@ def admin_leads():
 
 
 @app.route("/")
-@app.route("/slideshow")
 def landing():
-    """Serve the temporary Discovery Deck while the main site is rebuilt."""
+    """Serve the approved refund-recovery homepage."""
+    return render_template_string(LANDING_HTML)
+
+
+@app.route("/slideshow")
+def slideshow():
+    """Retain the Discovery Deck as a reversible presentation route."""
     return render_template_string(SLIDESHOW_HTML, slides=SLIDE_DATA)
 
 
@@ -197,7 +202,7 @@ def book():
 @app.route("/version")
 def version():
     return jsonify({
-        "version": "2026-07-13-slideshow",
+        "version": "2026-07-14-approved-revamp",
         "routes": ["/", "/slideshow", "/main-preview", "/book", "/admin/leads", "/api/lead"],
     })
 
@@ -234,7 +239,9 @@ def submit_lead():
     return jsonify({"ok": True, "message": "Thanks! We'll send your free refund-recovery audit within 24 hours."})
 
 
-LANDING_HTML = r"""<!DOCTYPE html>
+# Preserved exactly as the rollback source and the single source of truth for the
+# frozen FAQ block during the discovery-deck revamp review.
+LEGACY_LANDING_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1382,6 +1389,592 @@ draw();
 </body>
 </html>"""
 
+# ---------------------------------------------------------------------------
+# /main-preview — PDF-sourced homepage revamp draft
+# ---------------------------------------------------------------------------
+
+_FAQ_START_MARKER = "<!-- FAQ -->"
+_FAQ_END_MARKER = "<!-- CTA BANNER -->"
+
+# Website-ready FAQ supplied by Jayson in ShipZen-FAQs.pdf on 2026-07-13.
+# The source contains a duplicated product-value question; the fuller qualified
+# version is retained here and the shorter duplicate is intentionally omitted.
+_WEBSITE_FAQ_HTML = r"""<!-- FAQ -->
+<section class="faq-section" id="faq">
+<div class="container">
+<p class="sl c">FAQs</p>
+<h2 class="st c">Everything you need to know</h2>
+<p class="sd c">Common questions about ShipZen and carrier refund recovery.</p>
+<div class="faq-wrap">
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What does ShipZen do?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen audits your carrier shipments and files eligible claims to recover money from service failures, lost or damaged packages, delivered-not-received issues, return-to-sender errors, and billing mistakes. We help recover both shipping cost and product value where applicable.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How is ShipZen different from basic claims software?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Most tools rely on automation only. ShipZen combines real-time audit automation with human claims experts who understand how carriers review, deny, and approve claims.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Do we need to switch carriers?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">No. ShipZen works with your existing carrier accounts, negotiated rates, reps, and fulfillment workflow.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How long does setup take?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Setup is fast and low-lift. We securely connect to your existing carrier accounts and begin auditing eligible shipments without requiring your team to change how it ships.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What carriers do you support?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen can support major parcel carriers such as UPS and FedEx, depending on your account setup, service types, and available claim paths.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What shipping issues can you recover for?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">We audit for late deliveries, lost packages, damaged goods, delivered-not-received cases, return-to-sender issues, duplicate charges, dimensional-weight errors, incorrect surcharges, and other recoverable billing mistakes.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Can ShipZen recover the product value too, or only the shipping cost?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Yes, when the claim type and carrier rules allow it. For late-delivery or service-guarantee claims, recovery usually applies to the shipping charge only. For lost or damaged shipments, ShipZen can pursue product-value recovery when the carrier allows it, but reimbursement depends on declared value, carrier liability limits, and proof such as invoice value, replacement cost, item details, photos, or customer documentation. For UPS and FedEx, the first $100 of shipment value is typically covered under standard liability. If the item is worth more than $100 but no higher declared value was added and paid for at the time of shipment, the carrier may limit product-value reimbursement to $100.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How far back can you audit?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">It depends on the carrier and claim type. Late-delivery refunds often have very short windows, while lost, damaged, and billing claims may allow longer windows. ShipZen prioritizes real-time filing so opportunities do not expire.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Does filing claims hurt our carrier relationship?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">No. Eligible refunds and credits are part of carrier agreements and service policies. ShipZen files professionally and within the applicable rules.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What if we signed a late-delivery waiver?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">A late-delivery waiver may limit service-guarantee refunds, but it usually does not eliminate other recovery categories such as lost packages, damage, duplicate charges, invoice errors, dimensional-weight mistakes, or certain surcharge disputes.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How much does ShipZen cost?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen uses success-based pricing. There are no upfront fees and no subscriptions. If we do not recover money, you do not pay us.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How does the 50/50 split work?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">The carrier credits the full refund to your account. ShipZen invoices for 50% of the successfully recovered amount at the end of the month.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Do you take the refund before we receive it?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">No. Refunds and credits go directly to your carrier account first. ShipZen invoices separately after the recovery is received.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How do we see what was recovered?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">You receive transparent reporting that shows what was recovered, where it came from, and the claim category behind each credit.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">Is our data secure?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">ShipZen uses secure carrier-account connections and only accesses the data needed to audit shipments, validate exceptions, and file claims. We do not sell customer data.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What does our team need to do after setup?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">Very little. ShipZen runs in the background: monitoring shipments, flagging exceptions, preparing claims, filing eligible recoveries, and tracking outcomes.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">What happens if a claim is denied?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">When a valid claim is denied, ShipZen can review the reason, correct documentation gaps, and appeal or refile when the carrier rules allow it.</div></div></div>
+<div class="faq-item"><button class="faq-q" onclick="tFaq(this)">How do we get started?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-ans"><div class="faq-ans-inner">We start with a quick look at your shipping volume, carrier mix, service types, and biggest pain points. From there, ShipZen estimates recovery opportunities and confirms the best setup path.</div></div></div>
+</div>
+</div>
+</section>
+"""
+
+_REVAMP_BEFORE_FAQ = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShipZen | Carrier Refund Recovery for E-Commerce</title>
+<meta name="description" content="ShipZen automatically audits shipping exceptions and uses former carrier experts to pursue eligible refunds for late, lost, damaged, return-to-sender, and not-received shipments.">
+<link rel="canonical" href="https://shipzen.co/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#ffffff;--bg-off:#f8fafb;--bg-blue:#f0f5ff;--bg-sage:#F6F4F0;
+--navy:#1a1a1a;--deep:#0d2448;--body:#475569;--muted:#64748b;
+--accent:#1a1a1a;--accent-hover:#333;--cyan:#00b4d8;--green:#10b981;
+--border:#e2e8f0;--border-lt:#eef1f5;
+--shadow-sm:0 1px 3px rgba(0,0,0,.04);--shadow:0 4px 16px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.08);
+--radius:12px;--radius-lg:16px;--radius-xl:20px;
+--max-w:1280px;--tr:.25s ease;
+--font-head:'Nunito',sans-serif;--font-body:'Inter',sans-serif;
+}
+html{font-size:16px;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);color:var(--body);background:#ABCDE9;line-height:1.7}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button,input{font:inherit}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 1.5rem}
+.skip-link{position:fixed;left:18px;top:12px;z-index:9999;background:#fff;color:var(--navy);padding:10px 16px;border-radius:9999px;transform:translateY(-150%);box-shadow:var(--shadow-lg)}
+.skip-link:focus{transform:translateY(0)}
+
+/* ===== CLOUD BACKGROUND (matches live shipzen.co) ===== */
+.cloud-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.cloud-bg .sky-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8;mix-blend-mode:multiply}
+.cloud-bg .sky-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(166,203,232,.2),rgba(191,217,239,.4),rgba(234,227,214,.6))}
+.cloud-bg .cloud-img{position:absolute;width:50%;opacity:.4;mix-blend-mode:screen;filter:blur(24px);pointer-events:none}
+.cloud-bg .cloud-l{top:20%;left:-10%}
+.cloud-bg .cloud-r{top:30%;right:-10%}
+main,section,.nav,.footer{position:relative;z-index:1}
+.glass{background:rgba(255,255,255,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.6)}
+
+/* ===== NAV ===== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.nav-inner{max-width:var(--max-w);margin:0 auto;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-family:var(--font-head);font-weight:700;font-size:1.2rem;color:var(--navy);display:flex;align-items:center;gap:.5rem}
+.nav-brand svg{flex-shrink:0}
+.nav-actions{display:flex;align-items:center;gap:.75rem}
+.nav-links{display:flex;align-items:center;gap:1.4rem;margin-right:.5rem}
+.nav-links a{font-size:.85rem;font-weight:500;color:var(--body)}
+.nav-links a:hover{color:var(--navy)}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;background:var(--accent);color:#fff;padding:.6rem 1.5rem;border-radius:9999px;font-weight:500;font-size:.88rem;transition:all var(--tr);text-decoration:none;border:none;cursor:pointer;font-family:inherit}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;background:rgba(255,255,255,.6);color:var(--navy);padding:.6rem 1.5rem;border-radius:9999px;font-weight:500;font-size:.88rem;border:1px solid rgba(255,255,255,.8);cursor:pointer;transition:all var(--tr);backdrop-filter:blur(8px)}
+.btn-ghost:hover{background:rgba(255,255,255,.85)}
+
+/* ===== SECTION LABELS ===== */
+.sl{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem}
+.st{font-family:var(--font-head);font-size:clamp(1.75rem,3.5vw,2.85rem);font-weight:600;letter-spacing:-.035em;color:var(--navy);margin-bottom:.75rem;line-height:1.15}
+.sd{color:var(--body);max-width:600px;font-size:1.05rem;margin-bottom:1.75rem;line-height:1.65}
+.sl.c,.st.c,.sd.c{text-align:center;margin-left:auto;margin-right:auto}
+.sz-section{padding:3rem 0 4rem}
+
+/* ===== HERO (center aligned) ===== */
+.hero{padding:calc(64px + 4.5rem) 0 2.75rem;text-align:center}
+.hero-tag{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:600;color:var(--navy);background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);padding:.35rem .85rem;border-radius:9999px;margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.06em;backdrop-filter:blur(8px)}
+.hero h1{font-family:var(--font-head);font-size:clamp(2.25rem,5vw,3.75rem);font-weight:600;line-height:1.05;letter-spacing:-.04em;color:var(--navy);margin:0 auto 1.25rem;max-width:900px}
+.hero-sub{font-size:1.1rem;color:var(--body);margin:0 auto 1.75rem;line-height:1.65;max-width:680px}
+.hero-sub strong{color:var(--navy)}
+.hero-badges{display:flex;justify-content:center;gap:2.25rem;flex-wrap:wrap;margin-bottom:2rem}
+.hero-badge{display:flex;gap:.6rem;align-items:flex-start;text-align:left;max-width:215px}
+.hero-badge-ico{width:34px;height:34px;flex-shrink:0;border-radius:10px;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.hero-badge-ico svg{width:17px;height:17px;color:#2563eb}
+.hero-badge strong{display:block;font-family:var(--font-head);font-size:.82rem;font-weight:700;color:var(--navy);line-height:1.3}
+.hero-badge span{display:block;font-size:.72rem;color:var(--muted);line-height:1.5;margin-top:.15rem}
+.hero-ctas{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+.hero-note{font-size:.8rem;color:var(--muted);margin-top:.9rem}
+
+/* Hero dashboard graphic */
+.dash-card{max-width:880px;margin:2.5rem auto 0;border-radius:var(--radius-xl);overflow:hidden;background:rgba(255,255,255,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.8);box-shadow:0 8px 32px rgba(0,0,0,.08);text-align:left}
+.dash-top{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border-lt)}
+.dash-title{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-size:.85rem;font-weight:700;color:var(--navy)}
+.dash-live{display:flex;align-items:center;gap:.4rem;color:var(--green);font-size:.68rem;font-weight:700;letter-spacing:.08em}
+.dash-live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green)}
+.dash-heads,.dash-row{display:grid;grid-template-columns:1.3fr .85fr .75fr;gap:12px;align-items:center}
+.dash-heads{padding:.65rem 1.25rem;color:var(--muted);font-size:.64rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.dash-row{padding:.95rem 1.25rem;border-top:1px solid var(--border-lt)}
+.dash-event strong{display:block;color:var(--navy);font-size:.85rem;font-weight:600}
+.dash-event span{display:block;margin-top:2px;color:var(--muted);font-size:.7rem}
+.dash-review{font-size:.74rem;color:var(--body)}
+.dash-status{justify-self:start;padding:.28rem .55rem;border-radius:9999px;font-size:.64rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.status-auto{background:var(--bg-blue);color:#2563eb;border:1px solid #dbeafe}
+.status-human{background:#ecfeff;color:#0891b2;border:1px solid #cffafe}
+.status-won{background:#ecfdf5;color:#059669;border:1px solid #d1fae5}
+.dash-foot{display:flex;justify-content:space-between;gap:.75rem;padding:.7rem 1.25rem;border-top:1px solid var(--border-lt);font-size:.7rem;color:var(--muted)}
+
+/* ===== TRUST & RESULTS BAR ===== */
+.stats-section{padding:0;background:rgba(255,255,255,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.6);border-bottom:1px solid rgba(255,255,255,.6);margin-top:3rem}
+.stats-inner{max-width:var(--max-w);margin:0 auto;padding:2rem 2rem 1.4rem}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;text-align:center}
+.stat-item{padding:1rem .5rem}
+.stat-val{font-family:var(--font-head);font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--navy);letter-spacing:-.04em;line-height:1.1}
+.stat-label{font-size:.88rem;color:var(--body);margin-top:.35rem;font-weight:500}
+.stats-disclaimer{text-align:center;font-size:.72rem;color:var(--body);padding:0 2rem 1.1rem;max-width:680px;margin:0 auto}
+
+/* ===== PROBLEM CARDS ===== */
+.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.problem-card,.minute-rule-callout{background:rgba(255,255,255,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.7);border-radius:var(--radius-xl);padding:1.75rem;transition:box-shadow .35s,transform .35s;display:flex;flex-direction:column}
+.problem-card:hover,.minute-rule-callout:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+.minute-rule-callout{border:1px solid rgba(0,180,216,.45);box-shadow:0 0 0 3px rgba(0,180,216,.08)}
+.warn-ico{width:36px;height:36px;border-radius:10px;background:var(--bg-blue);display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.warn-ico svg{width:18px;height:18px;color:#2563eb}
+.minute-rule-callout .warn-ico{background:#ecfeff}
+.minute-rule-callout .warn-ico svg{color:var(--cyan)}
+.problem-card h3,.minute-rule-callout h3{font-family:var(--font-head);font-size:1.1rem;font-weight:600;line-height:1.35;color:var(--navy);margin-bottom:.5rem}
+.problem-card p,.minute-rule-callout p{font-size:.875rem;color:var(--body);line-height:1.7;flex:1}
+.minute-rule-urgency{display:block;margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--border-lt);font-size:.8rem;font-weight:700;color:var(--navy)}
+
+/* ===== SOLUTION LAYERS ===== */
+.layer-wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:980px;margin:0 auto}
+.layer-card{background:rgba(255,255,255,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.7);border-radius:var(--radius-xl);padding:1.9rem;transition:box-shadow .35s,transform .35s}
+.layer-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+.layer-label{display:inline-flex;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;background:var(--bg-blue);padding:.3rem .7rem;border-radius:9999px;margin-bottom:1rem}
+.layer-card h3{font-family:var(--font-head);font-size:1.3rem;font-weight:700;color:var(--navy);margin-bottom:1rem}
+.layer-list{list-style:none;display:flex;flex-direction:column;gap:.7rem}
+.layer-list li{display:flex;gap:.55rem;align-items:flex-start;font-size:.9rem;color:var(--body);line-height:1.55}
+.layer-list svg{width:16px;height:16px;flex-shrink:0;color:var(--green);margin-top:.25rem}
+.layer-plus{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:1.15rem;color:var(--navy);z-index:2}
+
+/* ===== INSIDER QUOTE BAND (navy color break) ===== */
+.quote-band{background:linear-gradient(120deg,var(--deep) 0%,#123059 55%,#0d2448 100%);position:relative;overflow:hidden;padding:4.25rem 0}
+.quote-band::before{content:'\201C';position:absolute;top:-3.2rem;left:2rem;font-family:var(--font-head);font-size:16rem;font-weight:800;color:rgba(255,255,255,.05);line-height:1;pointer-events:none}
+.quote-band::after{content:'';position:absolute;right:-12%;top:-40%;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(0,180,216,.22),transparent 65%);pointer-events:none}
+.quote-inner{display:flex;gap:1.4rem;align-items:flex-start;max-width:880px;margin:0 auto;position:relative}
+.quote-badge{width:54px;height:54px;flex-shrink:0;border-radius:16px;background:rgba(0,180,216,.16);border:1px solid rgba(0,180,216,.4);display:flex;align-items:center;justify-content:center}
+.quote-badge svg{width:26px;height:26px}
+.quote-band blockquote p{font-family:var(--font-head);font-size:clamp(1.2rem,2.4vw,1.6rem);font-weight:700;font-style:italic;color:#fff;line-height:1.5;letter-spacing:-.015em}
+.quote-band blockquote footer{display:flex;align-items:center;gap:.6rem;margin-top:1.1rem;font-size:.82rem;color:rgba(255,255,255,.65);font-style:normal}
+.quote-band blockquote footer::before{content:'';width:26px;height:2px;background:var(--cyan)}
+
+/* ===== COLOR BREAK BANDS ===== */
+.band-light{background:rgba(255,255,255,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.6);border-bottom:1px solid rgba(255,255,255,.6)}
+
+/* ===== WHAT WE RECOVER ===== */
+.claims-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}
+.claim-tile{background:rgba(255,255,255,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.7);border-radius:var(--radius-lg);padding:1.4rem 1rem;text-align:center;transition:box-shadow .35s,transform .35s}
+.claim-tile:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+.claim-ico{width:44px;height:44px;border-radius:12px;background:var(--bg-blue);display:flex;align-items:center;justify-content:center;margin:0 auto .75rem}
+.claim-ico svg{width:22px;height:22px;color:#2563eb}
+.claim-tile h3{font-family:var(--font-head);font-size:.95rem;font-weight:600;color:var(--navy)}
+.recovery-note{max-width:720px;margin:1.75rem auto 0;text-align:center;font-size:.8rem;color:var(--body)}
+
+/* ===== HOW SHIPZEN WORKS ===== */
+.steps-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}
+.step-card{position:relative;background:rgba(255,255,255,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.7);border-radius:var(--radius-lg);padding:1.5rem 1rem 1.4rem;text-align:center;transition:box-shadow .35s,transform .35s}
+.step-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--deep);color:#fff;font-family:var(--font-head);font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;margin:0 auto .85rem}
+.step-ico{width:44px;height:44px;border-radius:12px;background:var(--bg-blue);display:flex;align-items:center;justify-content:center;margin:0 auto .8rem}
+.step-ico svg{width:22px;height:22px;color:#2563eb}
+.step-card h3{font-family:var(--font-head);font-size:.92rem;font-weight:700;color:var(--navy);margin-bottom:.4rem;line-height:1.3}
+.step-card p{font-size:.74rem;color:var(--muted);line-height:1.55}
+.step-card:not(:last-child)::after{content:'';position:absolute;top:50%;right:-14px;width:14px;height:2px;background:repeating-linear-gradient(90deg,var(--muted) 0 4px,transparent 4px 8px);opacity:.5}
+
+/* ===== INTEGRATION ===== */
+.integ-card{background:var(--bg-sage);border-radius:var(--radius-xl);padding:3rem 3.5rem;max-width:820px;margin:0 auto;text-align:center}
+.flow{display:flex;align-items:center;justify-content:center;gap:0;margin:2rem auto 1.75rem;flex-wrap:wrap}
+.flow-node{display:flex;flex-direction:column;align-items:center;gap:.5rem;min-width:120px}
+.flow-chip{width:64px;height:64px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.06);font-family:var(--font-head);font-weight:800;font-size:.9rem;color:var(--navy)}
+.flow-node span{font-size:.72rem;font-weight:600;color:var(--muted)}
+.flow-link{flex:0 0 64px;height:2px;background:repeating-linear-gradient(90deg,var(--cyan) 0 6px,transparent 6px 12px);position:relative;top:-14px}
+.flow-node.sz .flow-chip{background:var(--deep);color:#fff}
+.integ-copy{font-size:1.05rem;color:var(--body);line-height:1.7;max-width:620px;margin:0 auto}
+
+/* ===== REAL RESULTS / PRICING SPLIT ===== */
+.results-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:3rem;align-items:center;max-width:1020px;margin:0 auto}
+.pie-wrap{text-align:center}
+.pie{width:210px;height:210px;border-radius:50%;background:conic-gradient(var(--cyan) 0 50%, var(--deep) 50% 100%);margin:0 auto;position:relative;box-shadow:0 8px 32px rgba(13,36,72,.18)}
+.pie span{position:absolute;font-family:var(--font-head);font-weight:800;font-size:1.35rem;color:#fff}
+.pie .pl{left:14%;top:42%}
+.pie .pr{right:14%;top:42%}
+.pie-caption{margin-top:1.1rem;font-family:var(--font-head);font-size:.85rem;font-weight:700;color:var(--navy)}
+.split-legend{display:flex;flex-direction:column;gap:1.1rem;margin:1.4rem 0}
+.split-item{display:flex;gap:.7rem;align-items:flex-start}
+.split-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:.35rem}
+.split-dot.keep{background:var(--cyan)}
+.split-dot.zen{background:var(--deep)}
+.split-item strong{display:block;font-family:var(--font-head);font-size:.95rem;font-weight:700;color:var(--navy)}
+.split-item span{display:block;font-size:.85rem;color:var(--body);line-height:1.6}
+.price-rules{border-top:1px solid var(--border-lt);max-width:420px}
+.price-rule{display:flex;justify-content:space-between;padding:.8rem .25rem;border-bottom:1px solid var(--border-lt);font-size:.85rem}
+.price-rule span{color:var(--muted)}.price-rule strong{color:var(--navy);font-weight:700}
+
+/* ===== FAQ ===== */
+.faq-section{padding:3rem 0 4rem}
+.faq-section .container{max-width:var(--max-w)}
+.faq-wrap{max-width:720px;margin:0 auto;background:rgba(255,255,255,.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.6);border-radius:var(--radius-xl);padding:1rem 2rem;box-shadow:0 8px 32px rgba(0,0,0,.04)}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.6)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;background:none;border:none;padding:1.15rem 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:var(--font-head);font-size:.95rem;font-weight:600;color:var(--navy);text-align:left;gap:.75rem;transition:color var(--tr)}
+.faq-q:hover{color:var(--muted)}
+.faq-chevron{width:18px;height:18px;flex-shrink:0;transition:transform .3s;color:var(--muted)}
+.faq-item.open .faq-chevron{transform:rotate(180deg)}
+.faq-ans{max-height:0;overflow:hidden;transition:max-height .35s}
+.faq-item.open .faq-ans{max-height:600px}
+.faq-ans-inner{padding:0 0 1.15rem;font-size:.85rem;color:var(--body);line-height:1.75}
+
+/* ===== FINAL CTA BANNER (navy per mockup) ===== */
+.cta-section{background:var(--deep);border-top:1px solid rgba(255,255,255,.1)}
+.cta-section .container{padding-top:4rem;padding-bottom:4rem}
+.cta-inner{text-align:center}
+.cta-inner h2{font-family:var(--font-head);font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;letter-spacing:-.03em;color:#fff;margin-bottom:.65rem;max-width:760px;margin-left:auto;margin-right:auto}
+.cta-inner p{font-size:.95rem;color:rgba(255,255,255,.75);max-width:460px;margin:0 auto 1.75rem;line-height:1.7}
+.cta-buttons{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.btn-cta-w{display:inline-flex;background:var(--cyan);color:#fff;font-weight:600;font-size:.9rem;font-family:inherit;padding:.75rem 1.85rem;border-radius:9999px;border:none;cursor:pointer;transition:all var(--tr);text-decoration:none}
+.btn-cta-w:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,180,216,.35)}
+
+/* ===== FOOTER ===== */
+.footer{background:var(--navy);color:#fff;padding:4.5rem 0 2rem}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:3rem}
+.footer-brand{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:#fff;margin-bottom:.75rem}
+.footer-desc{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.7;max-width:280px}
+.footer-col h3{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:1rem}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:.55rem}
+.footer-col ul a{font-size:.84rem;color:rgba(255,255,255,.65);transition:color var(--tr)}
+.footer-col ul a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;font-size:.75rem;color:rgba(255,255,255,.35)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:920px){
+.problem-grid{grid-template-columns:1fr}
+.layer-wrap{grid-template-columns:1fr}
+.layer-plus{display:none}
+.results-grid{grid-template-columns:1fr;gap:2rem}
+.claims-grid{grid-template-columns:repeat(2,1fr)}
+.steps-grid{grid-template-columns:repeat(2,1fr)}
+.step-card:not(:last-child)::after{display:none}
+.integ-card{padding:2.25rem 1.75rem}
+.price-rules{margin:0 auto}
+}
+@media(max-width:768px){
+.stats-grid{grid-template-columns:1fr;gap:1rem}
+.footer-grid{grid-template-columns:repeat(2,1fr)}
+.nav-links{display:none}
+.dash-heads{display:none}
+.dash-row{grid-template-columns:1fr auto}
+.dash-review{display:none}
+.hero-badges{gap:1.1rem}
+}
+@media(max-width:480px){
+.claims-grid{grid-template-columns:1fr}
+.steps-grid{grid-template-columns:1fr}
+.footer-grid{grid-template-columns:1fr}
+.hero-ctas{flex-direction:column;align-items:stretch}
+.hero-badges{flex-direction:column;align-items:center}
+.hero-badge{max-width:280px}
+.flow-link{flex-basis:28px}
+.pie{width:180px;height:180px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+<noscript><style>.faq-ans{max-height:none!important;overflow:visible!important}</style></noscript>
+</head>
+<body data-shipzen-revamp="discovery-deck-v1">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- FIXED CLOUD BACKGROUND -->
+<div class="cloud-bg">
+<img class="sky-img" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/bfd2f4cf-65ed-4b1a-86d1-a1710619267b_1600w.png" alt="" loading="eager">
+<div class="sky-gradient"></div>
+<img class="cloud-img cloud-l" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/4734259a-bad7-422f-981e-ce01e79184f2_1600w.jpg" alt="" loading="eager">
+<img class="cloud-img cloud-r" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/917d6f93-fb36-439a-8c48-884b67b35381_1600w.jpg" alt="" loading="eager">
+</div>
+
+<!-- NAV -->
+<nav class="nav" aria-label="Primary navigation">
+<div class="nav-inner">
+<a href="/" class="nav-brand" aria-label="ShipZen home">
+<svg width="28" height="28" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M4,2L36,2Q39,2 39,5L39,14L7,29L1,14L1,5Q1,2 4,2Z" fill="#1e3a8a"/><path d="M33,11L39,26L39,35Q39,38 36,38L4,38Q1,38 1,35L1,26Z" fill="#00b4d8" opacity=".80"/></svg>
+ShipZen
+</a>
+<div class="nav-actions">
+<div class="nav-links" aria-label="Page sections">
+<a href="#how-it-works">How It Works</a><a href="#recoveries">What We Recover</a><a href="#results">Results</a><a href="#faq">FAQ</a>
+</div>
+<a href="/book" class="btn-primary">Book a Demo</a>
+</div>
+</div>
+</nav>
+
+<main id="main-content">
+
+<!-- HERO (center aligned) -->
+<section class="hero" id="top">
+<div class="container">
+<div class="hero-tag">Claims Automation for Modern Shippers</div>
+<h1>The shipping money carriers don't want you to know about.</h1>
+<p class="hero-sub">ShipZen automatically audits shipping exceptions and uses former carrier experts to win your eligible claims. Recover <strong>the cost of your goods and the shipping label</strong> without adding a single task to your team.</p>
+<div class="hero-badges">
+<div class="hero-badge">
+<div class="hero-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+<div><strong>No Win, No Fee</strong><span>We only get paid when you get paid.</span></div>
+</div>
+<div class="hero-badge">
+<div class="hero-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+<div><strong>Easy Integration</strong><span>Connect your data in minutes, not weeks.</span></div>
+</div>
+<div class="hero-badge">
+<div class="hero-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+<div><strong>Full Transparency</strong><span>Track every claim and refund in real time.</span></div>
+</div>
+</div>
+<div class="hero-ctas">
+<a class="btn-primary" href="#how-it-works" style="padding:.75rem 1.85rem;font-size:.95rem">See ShipZen in Action</a>
+<a class="btn-ghost" href="/book" style="padding:.75rem 1.85rem;font-size:.95rem">Book a Demo</a>
+</div>
+<p class="hero-note">No upfront fees. If we do not recover money, you pay nothing.</p>
+
+<aside class="dash-card" aria-label="Illustrative ShipZen exception audit feed">
+<div class="dash-top"><div class="dash-title"><svg width="18" height="18" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M4,2L36,2Q39,2 39,5L39,14L7,29L1,14L1,5Q1,2 4,2Z" fill="#1e3a8a"/><path d="M33,11L39,26L39,35Q39,38 36,38L4,38Q1,38 1,35L1,26Z" fill="#00b4d8" opacity=".80"/></svg>Exception audit</div><span class="dash-live">MONITORING</span></div>
+<div class="dash-heads"><span>Shipment event</span><span>Review layer</span><span>State</span></div>
+<div class="dash-row"><div class="dash-event"><strong>Late delivery</strong><span>Time-definite service</span></div><div class="dash-review">Terms check</div><span class="dash-status status-auto">Automated</span></div>
+<div class="dash-row"><div class="dash-event"><strong>Damaged goods</strong><span>Evidence package</span></div><div class="dash-review">Expert review</div><span class="dash-status status-human">Human review</span></div>
+<div class="dash-row"><div class="dash-event"><strong>Lost package</strong><span>Carrier follow-up</span></div><div class="dash-review">Claim pursuit</div><span class="dash-status status-won">Recovered</span></div>
+<div class="dash-foot"><span><strong>Illustrative workflow</strong>, not customer data</span><span>Automation catches it. Experts finish it.</span></div>
+</aside>
+</div>
+</section>
+
+<!-- TRUST & RESULTS BAR -->
+<section class="stats-section" id="results" aria-label="Estimated Results">
+<div class="stats-inner">
+<div class="stats-grid">
+<div class="stat-item"><div class="stat-val">73%</div><div class="stat-label">Estimated overall win rate*</div></div>
+<div class="stat-item"><div class="stat-val">84%</div><div class="stat-label">Estimated delayed &amp; lost win rate*</div></div>
+<div class="stat-item"><div class="stat-val">$0</div><div class="stat-label">Upfront fees. You only pay on successful claims.</div></div>
+</div>
+</div>
+<p class="stats-disclaimer">*Based on internal data and industry benchmarks. ShipZen-supplied estimates. Actual results vary by carrier, claim type, documentation, shipping profile, and eligibility under carrier terms.</p>
+</section>
+
+<!-- THE PROBLEM (card grid) -->
+<section class="sz-section" id="problem">
+<div class="container">
+<p class="sl c">The Problem</p>
+<h2 class="st c">Why Refunds Go Unclaimed</h2>
+<p class="sd c" style="margin-bottom:2.25rem">Carrier agreements may allow refunds, but the process is layered with rules, proof requirements, and deadlines.</p>
+<div class="problem-grid">
+<article class="minute-rule-callout">
+<div class="warn-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+<h3>The Minute Rule</h3>
+<p>Miss a commitment time even by a single minute and an eligible time-definite service may qualify for a full shipping-cost refund under carrier terms.</p>
+<strong class="minute-rule-urgency">If you miss the deadline, the money is gone.</strong>
+</article>
+<article class="problem-card">
+<div class="warn-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+<h3>Hidden Policies</h3>
+<p>Rules are buried across service terms and fine print, spread over claim portals and carrier-specific exceptions.</p>
+</article>
+<article class="problem-card">
+<div class="warn-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+<h3>Unwritten Proof</h3>
+<p>Rejections are often about how the evidence was assembled, not whether the loss occurred.</p>
+</article>
+</div>
+</div>
+</section>
+
+<!-- INSIDER AUTHORITY (navy color break) -->
+<section class="quote-band" aria-label="ShipZen insider authority">
+<div class="container">
+<div class="quote-inner">
+<div class="quote-badge" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 40 40" fill="none"><path d="M4,2L36,2Q39,2 39,5L39,14L7,29L1,14L1,5Q1,2 4,2Z" fill="#7e9ee4"/><path d="M33,11L39,26L39,35Q39,38 36,38L4,38Q1,38 1,35L1,26Z" fill="#00b4d8" opacity=".80"/></svg></div>
+<blockquote>
+<p>We don't guess how to get a claim approved. We know, because we used to be the ones denying them.</p>
+<footer>The ShipZen claims team &middot; Former carrier claims reviewers</footer>
+</blockquote>
+</div>
+</div>
+</section>
+
+<!-- THE SOLUTION (two-sided with + connector) -->
+<section class="sz-section" id="advantage">
+<div class="container">
+<p class="sl c">The AI &amp; Human Advantage</p>
+<h2 class="st c">The Advantage: Solution Layers</h2>
+<p class="sd c" style="margin-bottom:2.25rem">Automation catches it. Experts finish it. Pure software can monitor at scale, but difficult claims still require judgment.</p>
+<div class="layer-wrap">
+<article class="layer-card">
+<span class="layer-label">Layer 1: AI Automation</span>
+<h3>AI Automation</h3>
+<ul class="layer-list">
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Auto-detect eligible claims</li>
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>File with precision</li>
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Track and follow up until resolved</li>
+</ul>
+</article>
+<div class="layer-plus" aria-hidden="true">+</div>
+<article class="layer-card">
+<span class="layer-label">Layer 2: Human Expertise</span>
+<h3>Human Expertise</h3>
+<ul class="layer-list">
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Claims reviewed by former carrier claims experts</li>
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Proven carrier negotiation strategies</li>
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Maximize your refund potential</li>
+</ul>
+</article>
+</div>
+</div>
+</section>
+
+<!-- WHAT WE RECOVER (icon grid) -->
+<section class="sz-section band-light" id="recoveries">
+<div class="container">
+<p class="sl c">What We Recover</p>
+<h2 class="st c">Comprehensive Recovery. Zero Manual Work.</h2>
+<p class="sd c" style="margin-bottom:2.25rem">Every major shipping exception, one recovery system.</p>
+<div class="claims-grid">
+<article class="claim-tile"><div class="claim-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><line x1="12" y1="22" x2="12" y2="12"/><polyline points="3.29 7 12 12 20.71 7"/></svg></div><h3>Lost Packages</h3></article>
+<article class="claim-tile"><div class="claim-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Damaged Goods</h3></article>
+<article class="claim-tile"><div class="claim-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><h3>Late Deliveries</h3></article>
+<article class="claim-tile"><div class="claim-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><h3>Not Received</h3></article>
+<article class="claim-tile"><div class="claim-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></div><h3>Return to Sender</h3></article>
+</div>
+<p class="recovery-note">Eligible claims may include the cost of your goods, the shipping label, or both, depending on carrier terms and claim type.</p>
+</div>
+</section>
+
+<!-- HOW SHIPZEN WORKS (5-step flow) -->
+<section class="sz-section" id="how-it-works">
+<div class="container">
+<p class="sl c">The Process</p>
+<h2 class="st c">How ShipZen Works</h2>
+<p class="sd c" style="margin-bottom:2.25rem">Five steps from connection to found money, with your team doing almost none of them.</p>
+<div class="steps-grid">
+<article class="step-card">
+<div class="step-num">1</div>
+<div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+<h3>Connect Your Data</h3>
+<p>Securely integrate your shipping data in minutes.</p>
+</article>
+<article class="step-card">
+<div class="step-num">2</div>
+<div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+<h3>We Find Eligible Claims</h3>
+<p>Our AI scans for late deliveries and other claim opportunities.</p>
+</article>
+<article class="step-card">
+<div class="step-num">3</div>
+<div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+<h3>We File &amp; Follow Up</h3>
+<p>We handle the filing and chase carriers on your behalf.</p>
+</article>
+<article class="step-card">
+<div class="step-num">4</div>
+<div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+<h3>You Get Refunds</h3>
+<p>Refunds are recovered and shared with you.</p>
+</article>
+<article class="step-card">
+<div class="step-num">5</div>
+<div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+<h3>You Keep More</h3>
+<p>More refunds. Less work. Better margins.</p>
+</article>
+</div>
+</div>
+</section>
+
+<!-- INTEGRATION (centered block) -->
+<section class="sz-section" id="integration">
+<div class="container">
+<div class="integ-card">
+<p class="sl c">Seamless Integration</p>
+<h2 class="st c" style="font-size:clamp(1.5rem,3vw,2rem)">Connect the accounts you already use.</h2>
+<div class="flow" aria-label="ShipZen integration flow">
+<div class="flow-node"><div class="flow-chip">UPS</div><span>Carrier account</span></div>
+<div class="flow-link" aria-hidden="true"></div>
+<div class="flow-node sz"><div class="flow-chip" aria-label="ShipZen">SZ</div><span>Recovery engine</span></div>
+<div class="flow-link" aria-hidden="true"></div>
+<div class="flow-node"><div class="flow-chip">FDX</div><span>Carrier account</span></div>
+</div>
+<p class="integ-copy">ShipZen syncs with your existing carrier accounts via secure API with absolutely no changes to your carriers, negotiated rates, or fulfillment workflow.</p>
+</div>
+</div>
+</section>
+
+<!-- REAL RESULTS / RECOVERY SPLIT -->
+<section class="sz-section band-light" id="pricing">
+<div class="container">
+<p class="sl c">Success-Based Pricing</p>
+<h2 class="st c">Success-Based Economics</h2>
+<p class="sd c" style="margin-bottom:2.5rem">No upfront fees or subscriptions. You keep 50% of the recovered funds, ShipZen keeps 50% for the filing and claim pursuit. If we do not recover money, you pay nothing.</p>
+<div class="results-grid">
+<div class="pie-wrap">
+<div class="pie" role="img" aria-label="Pie chart showing the 50/50 recovery split between you and ShipZen"><span class="pl">50%</span><span class="pr">50%</span></div>
+<p class="pie-caption">Typical Recovery Split</p>
+</div>
+<div>
+<div class="split-legend">
+<div class="split-item"><span class="split-dot keep" aria-hidden="true"></span><div><strong>You Keep (50%)</strong><span>You keep 50% of every successful recovery. Refunds are credited to your carrier account first; ShipZen invoices after.</span></div></div>
+<div class="split-item"><span class="split-dot zen" aria-hidden="true"></span><div><strong>ShipZen Keeps (50%)</strong><span>We only win when you win. The 50/50 split covers detection, filing, documentation, and claim pursuit.</span></div></div>
+</div>
+<div class="price-rules">
+<div class="price-rule"><span>Upfront cost</span><strong>$0</strong></div>
+<div class="price-rule"><span>Subscription</span><strong>None</strong></div>
+<div class="price-rule"><span>No recovery</span><strong>No fee</strong></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+"""
+
+_REVAMP_AFTER_FAQ = r"""<!-- CTA BANNER -->
+<section class="cta-section">
+  <div class="container"><div class="cta-inner"><h2>Every eligible exception left unfiled is money left with the carrier.</h2><p>Start with a free shipping audit. ShipZen will map the recovery opportunity against your actual carrier mix and shipment volume.</p><div class="cta-buttons"><a href="/book" class="btn-cta-w">Find Out What You're Owed</a></div></div></div>
+</section>
+<footer class="footer">
+  <div class="container"><div class="footer-grid"><div><div class="footer-brand"><svg width="24" height="24" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M4,2L36,2Q39,2 39,5L39,14L7,29L1,14L1,5Q1,2 4,2Z" fill="#7e9ee4"/><path d="M33,11L39,26L39,35Q39,38 36,38L4,38Q1,38 1,35L1,26Z" fill="#00b4d8" opacity=".80"/></svg>ShipZen</div><p class="footer-desc">Automated carrier refund recovery with expert human claims review for e-commerce shipping operations.</p></div><div class="footer-col"><h3>Service</h3><ul><li><a href="#recoveries">What We Recover</a></li><li><a href="#how-it-works">How It Works</a></li><li><a href="#results">Estimated Results</a></li></ul></div><div class="footer-col"><h3>Learn</h3><ul><li><a href="#problem">Why Claims Fail</a></li><li><a href="#faq">FAQ</a></li><li><a href="/book">Free Audit</a></li></ul></div><div class="footer-col"><h3>Contact</h3><ul><li><a href="/book">Book a Call</a></li></ul></div></div><div class="footer-bottom"><span>&copy; 2026 ShipZen. All rights reserved.</span><span>Success-based carrier refund recovery.</span></div></div>
+</footer>
+</main>
+<script>
+function tFaq(button){
+  var item=button.parentElement;
+  var wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(function(openItem){
+    openItem.classList.remove('open');
+    var openButton=openItem.querySelector('.faq-q');
+    if(openButton)openButton.setAttribute('aria-expanded','false');
+  });
+  if(!wasOpen){item.classList.add('open');button.setAttribute('aria-expanded','true')}
+  else{button.setAttribute('aria-expanded','false')}
+}
+document.querySelectorAll('.faq-q').forEach(function(button,index){
+  var answer=button.parentElement.querySelector('.faq-ans');
+  answer.id='faq-answer-'+(index+1);
+  button.setAttribute('aria-controls',answer.id);
+  button.setAttribute('aria-expanded','false');
+});
+</script>
+</body>
+</html>"""
+
+LANDING_HTML = _REVAMP_BEFORE_FAQ + _WEBSITE_FAQ_HTML + _REVAMP_AFTER_FAQ
 
 
 # ---------------------------------------------------------------------------
@@ -1394,7 +1987,7 @@ BOOK_HTML = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Book a Free Refund Audit — ShipZen</title>
-<meta name="description" content="Find out exactly how much carriers owe you in unclaimed refunds. Book a free 15-minute audit call with ShipZen.">
+<meta name="description" content="Review potential carrier refund opportunities in your shipping profile. Book a free 30-minute audit call with ShipZen.">
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1416,25 +2009,26 @@ a{color:inherit;text-decoration:none}
 .nav{position:relative;z-index:10;height:64px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.15);backdrop-filter:blur(12px)}
 .nav-brand{font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--navy);display:flex;align-items:center;gap:.5rem}
 .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+.hero{text-align:center}
 .hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;color:var(--navy);background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.85);padding:.3rem .85rem;border-radius:9999px;margin-bottom:1.1rem;text-transform:uppercase;letter-spacing:.07em;backdrop-filter:blur(8px)}
 .hero h1{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.08;letter-spacing:-.04em;color:var(--navy);margin-bottom:1rem}
 .hero h1 .hl{color:#2563eb}
-.hero-sub{font-size:1.05rem;color:var(--body);max-width:580px;margin-bottom:1.75rem;line-height:1.7}
-.trust-row{display:flex;flex-wrap:wrap;gap:.65rem 1.5rem;margin-bottom:2rem}
+.hero-sub{font-size:1.05rem;color:var(--body);max-width:620px;margin:0 auto 1.75rem;line-height:1.7}
+.trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:.65rem 1.5rem;margin-bottom:2rem}
 .trust-item{display:flex;align-items:center;gap:.45rem;font-size:.85rem;font-weight:600;color:var(--navy)}
 .trust-item svg{color:var(--green);flex-shrink:0}
-.savings-strip{background:rgba(255,255,255,.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.75);border-radius:16px;padding:1.25rem 1.75rem;margin-bottom:2rem;display:flex;flex-wrap:wrap;gap:1rem 2.5rem;align-items:center}
-.sav-item{text-align:center}
-.sav-val{font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:var(--navy);letter-spacing:-.03em;line-height:1.1}
-.sav-val .accent{color:#2563eb}
-.sav-label{font-size:.72rem;color:var(--muted);font-weight:500;margin-top:.15rem}
-.sav-divider{width:1px;height:40px;background:var(--border);flex-shrink:0}
-@media(max-width:500px){.sav-divider{display:none}.savings-strip{justify-content:space-around}}
 .cal-section{background:rgba(255,255,255,.7);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.85);border-radius:20px;padding:2rem 2rem 1rem;box-shadow:0 8px 32px rgba(0,0,0,.07);margin-bottom:2rem}
 .cal-header{margin-bottom:1.25rem}
 .cal-header h2{font-family:var(--font-head);font-size:1.35rem;font-weight:700;color:var(--navy);letter-spacing:-.025em;margin-bottom:.3rem}
 .cal-header p{font-size:.88rem;color:var(--muted)}
+.book-win-rate{display:grid;grid-template-columns:220px 1fr;gap:1.25rem;align-items:center;margin-bottom:1.25rem;padding:1.15rem 1.25rem;border-radius:14px;background:var(--navy);color:#fff;box-shadow:0 10px 24px rgba(0,0,0,.1)}
+.book-win-rate>strong{font-family:var(--font-head);font-size:1.35rem;line-height:1.15;color:#fff}
+.book-win-copy{padding-left:1.25rem;border-left:1px solid rgba(255,255,255,.2)}
+.book-win-copy b{display:block;font-size:.86rem;color:#fff}
+.book-win-copy p{margin-top:.25rem;font-size:.78rem;line-height:1.55;color:#dbeafe}
+.book-win-copy small{display:block;margin-top:.45rem;font-size:.64rem;line-height:1.45;color:#bfdbfe}
 .calendly-inline-widget{min-width:280px;height:700px}
+.cal-mobile-link.btn-book{display:none}
 .proof-section{margin-bottom:2rem}
 .proof-card{background:rgba(255,255,255,.55);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.7);border-radius:16px;padding:1.75rem 2rem;box-shadow:0 4px 20px rgba(0,0,0,.05)}
 .proof-quote{font-size:1rem;font-weight:500;color:var(--navy);line-height:1.7;font-style:italic;margin-bottom:1rem;padding-top:2rem;position:relative}
@@ -1459,11 +2053,14 @@ a{color:inherit;text-decoration:none}
 .btn-book:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
 @media(max-width:600px){
 .hero h1{font-size:1.9rem}
-.cal-section{padding:1.25rem 1rem .5rem}
-.calendly-inline-widget{height:650px}
+.cal-section{padding:1.25rem 1rem}
+.book-win-rate{grid-template-columns:1fr;gap:.8rem;padding:1rem}.book-win-copy{padding-left:0;padding-top:.8rem;border-left:0;border-top:1px solid rgba(255,255,255,.2)}
+.calendly-inline-widget{display:none}
+.cal-mobile-link.btn-book{display:inline-flex;width:100%;justify-content:center}
 .savings-strip{padding:1rem 1.25rem}
 }
 </style>
+<noscript><style>.faq-ans{max-height:none!important;overflow:visible!important}</style></noscript>
 </head>
 <body>
 <div class="cloud-bg">
@@ -1480,66 +2077,76 @@ ShipZen
   <section class="hero">
     <div class="hero-badge">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-      Free 15-Minute Refund Audit
+      Free 30-Minute Refund Audit
     </div>
     <h1>Carriers owe you <span class="hl">refunds</span><br>you're not claiming.</h1>
-    <p class="hero-sub">Every late delivery, lost package, Return-to-Sender, and damaged shipment is money the carrier owes you — and won't pay automatically. ShipZen audits your shipments and files the claims for you. No upfront fees, success-based. Book a free call and we'll show you exactly what's recoverable.</p>
+    <p class="hero-sub">Late deliveries, lost packages, Return-to-Sender events, and damaged shipments may create eligible carrier refund opportunities. ShipZen audits your shipments and pursues qualifying claims on a success-based model. Book a free call to review where recovery opportunities may exist.</p>
     <div class="trust-row">
       <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No upfront fees</div>
-      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No risk to sign up</div>
-      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Cancel anytime</div>
-      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Live in under 24 hours</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Success-based pricing</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Keep your carrier workflow</div>
+      <div class="trust-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Eligibility reviewed first</div>
     </div>
   </section>
-  <div class="savings-strip">
-    <div class="sav-item"><div class="sav-val">~73<span class="accent">%</span></div><div class="sav-label">estimated claim win rate</div></div>
-    <div class="sav-divider"></div>
-    <div class="sav-item"><div class="sav-val"><span class="accent">late</span>, <span class="accent">lost</span>, RTS &amp; damaged</div><div class="sav-label">claim types we recover</div></div>
-    <div class="sav-divider"></div>
-    <div class="sav-item"><div class="sav-val">$0</div><div class="sav-label">upfront — success-based</div></div>
-    <div class="sav-divider"></div>
-    <div class="sav-item"><div class="sav-val">2</div><div class="sav-label">recovered: shipping + product value</div></div>
-  </div>
   <div class="cal-section">
     <div class="cal-header">
       <h2>📅 Pick a time that works for you</h2>
-      <p>15 minutes. We'll pull your shipping data, show you exactly what carriers owe you, and answer any questions.</p>
+      <p>30 minutes. We'll review your shipping profile, outline potential recovery lanes, and answer your questions.</p>
     </div>
-    <!-- REPLACE THE URL BELOW WITH YOUR REAL CALENDLY LINK -->
+    <div class="book-win-rate">
+      <strong>73% estimated overall win rate</strong>
+      <div class="book-win-copy"><b>Find eligible money software-only workflows can miss.</b><p>ShipZen pairs automated detection with former-carrier claims review before difficult filings go out.</p><small>ShipZen-supplied estimate across filed claims. Results vary by carrier, claim type, documentation, shipping profile, and eligibility.</small></div>
+    </div>
     <div class="calendly-inline-widget" data-url="https://calendly.com/shipzen/30min?hide_gdpr_banner=1&primary_color=1e3a8a"></div>
+    <a href="https://calendly.com/shipzen/30min" class="cal-mobile-link btn-book" target="_blank" rel="noopener">See How Much You're Owed. <span aria-hidden="true">→</span></a>
   </div>
-  <div class="proof-section">
-    <div class="proof-card">
-      <div class="proof-quote">We had no idea how much we were leaving on the table. ShipZen plugged into our carrier account and started recovering refunds on late and damaged packages we never would have caught. It's completely hands-off — the money just shows up.</div>
-      <div class="proof-author">Sarah M. — Shopify Store Owner</div>
-      <div class="proof-role">~500 orders/month · Home goods</div>
-    </div>
-  </div>
+
   <div class="faq-section">
     <div class="faq-title">Common questions</div>
     <div class="faq-list">
       <div class="faq-item">
-        <button class="faq-q" onclick="tFaq(this)">What exactly does ShipZen recover?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="faq-ans"><div class="faq-ans-inner">Carrier refunds you're owed but rarely get automatically: late-delivery (service-guarantee) refunds, lost packages, Return-to-Sender (RTS), and damaged shipments. Where eligible we recover both the original shipping cost and the product value — and we file every claim for you.</div></div>
+        <button class="faq-q" onclick="tFaq(this)">What does ShipZen do?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">ShipZen audits your carrier shipments and files eligible claims to recover money from service failures, lost or damaged packages, delivered-not-received issues, return-to-sender errors, and billing mistakes. We help recover both shipping cost and product value where applicable.</div></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="tFaq(this)">What does it cost, and is there any risk?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="faq-ans"><div class="faq-ans-inner">Nothing upfront. ShipZen is success-based — we take a share only of the refunds we actually recover for you. If we don't recover anything, you don't pay. No contracts, no minimums, cancel anytime.</div></div>
+        <button class="faq-q" onclick="tFaq(this)">How much does ShipZen cost?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">ShipZen uses success-based pricing. There are no upfront fees and no subscriptions. If we do not recover money, you do not pay us.</div></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="tFaq(this)">Do I have to change how I ship?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="faq-ans"><div class="faq-ans-inner">No. Your carriers, reps, rates, and workflow stay exactly the same. ShipZen connects to your existing carrier account and works in the background. We integrate with Shopify, WooCommerce, BigCommerce, Etsy, Amazon, eBay, and more — most sellers are live within 24 hours.</div></div>
+        <button class="faq-q" onclick="tFaq(this)">Do we need to switch carriers?<svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-ans"><div class="faq-ans-inner">No. ShipZen works with your existing carrier accounts, negotiated rates, reps, and fulfillment workflow.</div></div>
       </div>
     </div>
   </div>
   <div class="bottom-cta">
     <p>Prefer to go straight to booking?</p>
-    <a href="https://calendly.com/shipzen/30min" class="btn-book" target="_blank">📅 Book Your Free Call</a>
+    <a href="https://calendly.com/shipzen/30min" class="btn-book" target="_blank" rel="noopener">See How Much You're Owed. <span aria-hidden="true">→</span></a>
   </div>
 </div>
-<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 <script>
-function tFaq(btn){var item=btn.closest('.faq-item');var wasOpen=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(function(el){el.classList.remove('open');});if(!wasOpen)item.classList.add('open');}
+if(window.matchMedia('(min-width: 601px)').matches){
+  var calendlyScript=document.createElement('script');
+  calendlyScript.src='https://assets.calendly.com/assets/external/widget.js';
+  calendlyScript.async=true;
+  document.head.appendChild(calendlyScript);
+}
+function tFaq(btn){
+  var item=btn.closest('.faq-item');
+  var wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(function(el){
+    el.classList.remove('open');
+    var openButton=el.querySelector('.faq-q');
+    if(openButton)openButton.setAttribute('aria-expanded','false');
+  });
+  if(!wasOpen){item.classList.add('open');btn.setAttribute('aria-expanded','true')}
+  else{btn.setAttribute('aria-expanded','false')}
+}
+document.querySelectorAll('.faq-q').forEach(function(btn,index){
+  var answer=btn.closest('.faq-item').querySelector('.faq-ans');
+  answer.id='book-faq-answer-'+(index+1);
+  btn.setAttribute('aria-controls',answer.id);
+  btn.setAttribute('aria-expanded','false');
+});
 </script>
 </body>
 </html>"""
@@ -1684,6 +2291,7 @@ SLIDESHOW_HTML = r"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ShipZen — Automated Carrier Auditing & Claims</title>
 <meta name="description" content="See how ShipZen audits carrier mistakes and recovers refunds across late, lost, damaged, Return-to-Sender, and not-received shipments.">
+<meta name="robots" content="noindex,nofollow">
 <link rel="canonical" href="https://shipzen.co/">
 <meta name="theme-color" content="#08111f">
 <style>

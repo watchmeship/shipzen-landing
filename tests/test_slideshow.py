@@ -11,8 +11,8 @@ class TemporarySlideshowTests(unittest.TestCase):
         cls.client = landing_v2.app.test_client()
         cls.repo_root = Path(landing_v2.__file__).resolve().parent
 
-    def test_homepage_serves_uploaded_fourteen_slide_deck(self):
-        response = self.client.get("/")
+    def test_slideshow_route_serves_uploaded_fourteen_slide_deck(self):
+        response = self.client.get("/slideshow")
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
 
@@ -21,10 +21,11 @@ class TemporarySlideshowTests(unittest.TestCase):
         self.assertIn("/static/slides/shipzen-discovery-01.webp", html)
         self.assertIn("/static/slides/shipzen-discovery-14.webp", html)
         self.assertIn("We recover the shipping money carriers don't want you to know about.", html)
+        self.assertEqual(html.count('<meta name="robots" content="noindex,nofollow">'), 1)
         self.assertNotIn("<iframe", html.lower())
 
-    def test_homepage_has_accessible_navigation_and_booking_cta(self):
-        html = self.client.get("/").get_data(as_text=True)
+    def test_slideshow_has_accessible_navigation_and_booking_cta(self):
+        html = self.client.get("/slideshow").get_data(as_text=True)
 
         self.assertIn('aria-label="Previous slide"', html)
         self.assertIn('aria-label="Next slide"', html)
@@ -37,14 +38,16 @@ class TemporarySlideshowTests(unittest.TestCase):
         self.assertIn("Start Your Free Audit", html)
 
     def test_only_current_slide_is_visually_active_during_cross_fades(self):
-        html = self.client.get("/").get_data(as_text=True)
+        html = self.client.get("/slideshow").get_data(as_text=True)
 
         self.assertNotIn(".slide:first-child", html)
         self.assertIn('.slide[aria-hidden="false"]', html)
 
-    def test_root_remains_indexable_and_has_canonical_url(self):
+    def test_root_serves_approved_revamp_and_remains_indexable(self):
         html = self.client.get("/").get_data(as_text=True).lower()
 
+        self.assertIn('data-shipzen-revamp="discovery-deck-v1"', html)
+        self.assertNotIn("data-shipzen-slideshow", html)
         self.assertNotIn('content="noindex,nofollow"', html)
         self.assertIn('<link rel="canonical" href="https://shipzen.co/">', html)
 
@@ -53,23 +56,41 @@ class TemporarySlideshowTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("data-shipzen-slideshow", response.get_data(as_text=True))
 
-    def test_main_preview_preserves_rewritten_homepage_and_is_not_indexed(self):
+    def test_approved_root_uses_production_home_link_and_footer(self):
+        html = self.client.get("/").get_data(as_text=True)
+
+        self.assertIn('href="/" class="nav-brand"', html)
+        self.assertNotIn("draft preview, not indexed", html.lower())
+
+    def test_approved_root_keeps_disclaimer_copy_readable_on_sky_backgrounds(self):
+        html = self.client.get("/").get_data(as_text=True)
+
+        self.assertRegex(html, r"\.stats-disclaimer\{[^}]*color:var\(--body\)")
+        self.assertRegex(html, r"\.recovery-note\{[^}]*color:var\(--body\)")
+
+    def test_main_preview_serves_pdf_sourced_revamp_and_is_not_indexed(self):
         response = self.client.get("/main-preview")
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
 
-        self.assertIn("Carriers owe you money", html)
-        self.assertIn('<meta name="robots" content="noindex,nofollow">', html)
+        self.assertIn('data-shipzen-revamp="discovery-deck-v1"', html)
+        self.assertIn(
+            "<h1>The shipping money carriers don't want you to know about.</h1>",
+            html,
+        )
+        self.assertEqual(html.count('<meta name="robots" content="noindex,nofollow">'), 1)
 
     def test_existing_book_and_lead_routes_remain_available(self):
         self.assertEqual(self.client.get("/book").status_code, 200)
         invalid = self.client.post("/api/lead", json={})
         self.assertEqual(invalid.status_code, 400)
 
-    def test_version_endpoint_advertises_temporary_route_map(self):
+    def test_version_endpoint_advertises_approved_revamp_route_map(self):
         response = self.client.get("/version")
         self.assertEqual(response.status_code, 200)
-        routes = response.get_json()["routes"]
+        payload = response.get_json()
+        self.assertEqual(payload["version"], "2026-07-14-approved-revamp")
+        routes = payload["routes"]
 
         self.assertIn("/", routes)
         self.assertIn("/slideshow", routes)
